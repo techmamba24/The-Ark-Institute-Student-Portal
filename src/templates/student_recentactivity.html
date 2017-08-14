@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+</head>
+<body>
+
+      <!-- Recent Activity -->
+        <div class="box box-primary">
+ 
+
+          <div class="box-header with-border text-center">
+            <h3 class="box-title">Recent Activity</h3>
+          </div>
+            
+        <div class="box-body">
+
+        <div class="nav-tabs-custom">
+
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#islamicstudiesfeed" data-toggle="tab">Islamic Studies {{request.user.profile.islamic_studies_class}}</a></li>
+              <li><a href="#quranfeed" data-toggle="tab">Quran {{request.user.profile.quran_class}}</a></li>
+             </ul>
+
+            <div class="tab-content">
+
+              <div class="active tab-pane" id="islamicstudiesfeed">
+              
+              {% if recent_islamic_studies %}
+
+                  <!-- The timeline -->
+                <ul class="timeline timeline-inverse">
+                  <!-- timeline time label -->
+             
+                  <!-- /.timeline-label -->
+                  {% for recent in recent_islamic_studies %}
+                    
+                {% if recent.title %}
+                      
+               
+                  <!-- timeline item -->
+                  <li>
+                    <i class="fa fa-envelope bg-green"></i>
+
+                    <div class="timeline-item">
+                      <span class="time"><i class="fa fa-clock-o"></i>{{recent.posted_date}}</span>
+
+                      <h3 class="timeline-header">
+                      <b>
+                            {% if recent.author.username == request.user.username %} 
+                            You
+                            {% else %}
+                            {{recent.author.first_name}} {{recent.author.last_name}}
+                            {% endif %}
+                      </b> posted in the class discussion.</h3>
+
+                      <div class="timeline-body">
+                                {{recent.message|safe}}
+                      </div>
+                      <div class="timeline-footer">
+                        <a class="btn btn-success btn-xs" href="{% url 'islamic_studies_post_detail' pk=recent.pk %}">View</a>
+                        <a class="btn btn-danger btn-xs" href="{% url 'comment_islamic_studies_post' pk=recent.pk %}">Comment</a>
+                      </div>
+                    </div>
+                  </li>
+                  <!-- END timeline item -->
+
+                {% endif %}
+
+                  {% if recent.comment %}
+                    
+                        <!-- timeline item -->
+                        <li>
+                          <i class="fa fa-comments bg-blue"></i>
+
+                          <div class="timeline-item">
+                            <span class="time"><i class="fa fa-clock-o"></i> {{recent.posted_date}}</span>
+
+                            <h3 class="timeline-header">
+                            <b>
+                            {% if recent.author.username == request.user.username %} 
+                            You
+                            {% else %}
+                            {{recent.author.first_name}} {{recent.author.last_name}}
+                            {% endif %}
+                            </b> 
+                            commented on {% if recent.post.author.username == request.user.username %} your
+                            {% else %}
+                            {{recent.post.author.first_name}} {{recent.post.author.last_name}}'s
+                            {% endif %} post</h3>
+
+                            <div class="timeline-body">
+                              {{recent.comment|safe}}
+                            </div>
+
+                            <div class="timeline-footer">
+                              <a class="btn btn-primary btn-flat btn-xs" href="{% url 'islamic_studies_post_detail' pk=recent.post.pk %}">View comment</a>
+                            </div>
+                          </div>
+                        </li>
+                        <!-- END timeline item --> 
+
+                  {% endif %}
+
+
+                  {% if recent.exam_number %}
+
+                         <li>
+                          <i class="fa fa-pencil bg-yellow"></i>
+
+                          <div class="timeline-item">
+                            <span class="time"><i class="fa fa-clock-o"></i> {{recent.posted_date}}</span>
+
+                            <h3 class="timeline-header">
+                            <b>
+                            Your teacher
+                            </b> 
+                            posted a score for Exam {{recent.exam_number}} </h3>
+
+
+                            <div class="timeline-footer">
+                              <a class="btn btn-warning btn-flat btn-xs" href="{% url 'student_detail' username=request.user.username %}">View Score</a>
+                            </div>
+                          </div>
+                        </li>
+                  
+                 {% endif %}
+
+
+              {% endfor %}
+
+              			<li>
+                          <i class="fa fa-clock-o bg-gray"></i>
+                        </li>
+              		
+
+                </ul>
+
+            {% else %}
+
+            No recent activity to show.
+
+            {% endif %}
+
+
+              </div>
+
+
+
+
+
+
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="quranfeed">
+
+              	{% if recent_quran %}
+              		
+          
+                  <!-- The timeline -->
+                <ul class="timeline timeline-inverse">
+                  <!-- timeline time label -->
+             
+                  <!-- /.timeline-label -->
+                  {% for recent in recent_quran %}
+                    
+                {% if recent.title %}
+                      
+               
+                  <!-- timeline item -->
+                  <li>
+                    <i class="fa fa-envelope bg-green"></i>
+
+                    <div class="timeline-item">
+                      <span class="time"><i class="fa fa-clock-o"></i>{{recent.posted_date}}</span>
+
+                      <h3 class="timeline-header">
+                      <b>
+                            {% if recent.author.username == request.user.username %} 
+                            You
+                            {% else %}
+                            {{recent.author.first_name}} {{recent.author.last_name}}
+                            {% endif %}
+                      </b> posted in the class discussion.</h3>
+
+                      <div class="timeline-body">
+                                {{recent.message|safe}}
+                      </div>
+                      <div class="timeline-footer">
+                        <a class="btn btn-success btn-xs" href="{% url 'quran_post_detail' pk=recent.pk %}">View</a>
+                        <a class="btn btn-danger btn-xs" href="{% url 'comment_quran_post' pk=recent.pk %}">Comment</a>
+                      </div>
+                    </div>
+                  </li>
+                  <!-- END timeline item -->
+
+                {% endif %}
+
+                  {% if recent.comment %}
+                    
+                        <!-- timeline item -->
+                        <li>
+                          <i class="fa fa-comments bg-blue"></i>
+
+                          <div class="timeline-item">
+                            <span class="time"><i class="fa fa-clock-o"></i> {{recent.posted_date}}</span>
+
+                            <h3 class="timeline-header">
+                            <b>
+                            {% if recent.author.username == request.user.username %} 
+                            You
+                            {% else %}
+                            {{recent.author.first_name}} {{recent.author.last_name}}
+                            {% endif %}
+                            </b> 
+                            commented on {% if recent.post.author.username == request.user.username %} your
+                            {% else %}
+                            {{recent.post.author.first_name}} {{recent.post.author.last_name}}'s
+                            {% endif %} post</h3>
+
+                            <div class="timeline-body">
+                              {{recent.comment|safe}}
+                            </div>
+
+                            <div class="timeline-footer">
+                              <a class="btn btn-primary btn-flat btn-xs" href="{% url 'quran_post_detail' pk=recent.post.pk %}">View comment</a>
+                            </div>
+                          </div>
+                        </li>
+                        <!-- END timeline item --> 
+
+                {% endif %}
+
+                {% if recent.exam_number %}
+
+                         <li>
+                          <i class="fa fa-pencil bg-yellow"></i>
+
+                          <div class="timeline-item">
+                            <span class="time"><i class="fa fa-clock-o"></i> {{recent.posted_date}}</span>
+
+                            <h3 class="timeline-header">
+                            <b>
+                            Your teacher
+                            </b> 
+                            posted a score for Exam {{recent.exam_number}} </h3>
+
+
+                            <div class="timeline-footer">
+                              <a class="btn btn-warning btn-flat btn-xs" href="{% url 'student_detail' username=request.user.username %}">View Score</a>
+                            </div>
+                          </div>
+                        </li>
+                  
+                {% endif %}
+
+
+
+              {% endfor %}
+
+                     <li>
+                          <i class="fa fa-clock-o bg-gray"></i>
+                     </li>
+
+                </ul>
+
+                {% else %}
+
+                No recent activity to show.
+
+    			{% endif %}
+
+
+              </div>
+
+            </div>
+            <!-- /.tab-content -->
+          </div>
+          <!-- /.nav-tabs-custom -->
+       
+          
+
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+          
+          
+          </div>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

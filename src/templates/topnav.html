@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+</head>
+<body>
+
+   <!-- Logo -->
+    <a href="{% url 'dashboard' %}" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels 
+      <span class="logo-mini"><b>A</b>LT</span>
+      logo for regular state and mobile devices 
+      <span class="logo-lg"><b>Admin</b>LTE</span>
+            <img src="{% static "logo2small.png" %}">
+
+      -->
+     <img src="{% static "logo2small.png" %}">
+
+    </a>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-static-top" role="navigation">
+      <!-- Sidebar toggle button -->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      
+      <!-- Navbar Right Menu -->
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <!-- Messages: style can be found in dropdown.less-->
+          <li class="dropdown messages-menu">
+            <!-- Menu toggle button -->
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-envelope-o"></i>
+
+              {% if request.user.profile.unread_quran_posts.count > 0 or request.user.profile.unread_islamic_studies_posts.count > 0 %}
+	              <span class="label label-success">
+	          
+	              	{{ request.user.profile.unread_quran_posts.count|add:request.user.profile.unread_islamic_studies_posts.count }} 
+	             
+	              </span>
+             {% endif %}
+
+            </a>
+            <ul class="dropdown-menu">
+              <li class="header">You have {{ request.user.profile.unread_quran_posts.count|add:request.user.profile.unread_islamic_studies_posts.count }}    
+ 				unread posts </li>
+
+ 			{% for post in request.user.profile.unread_quran_posts.all  %}		
+              <li>
+                <!-- inner menu: contains the messages -->
+                <ul class="menu">
+                  <li><!-- start message -->
+                    <a href="{% url 'quran_post_detail' pk=post.pk %}">
+                      <div class="pull-left">
+                        <!-- User Image -->
+                      <i class="fa fa-user-circle fa-2x"></i>                        
+                      </div>
+                      <!-- Message title and timestamp -->
+                      <h4>
+                        {{post.author.first_name}} {{post.author.last_name}}
+                        <small><i class="fa fa-clock-o"></i> {{post.posted_date}} </small>
+                      </h4>
+                      <!-- The message -->
+                      <p>{{post.title}}</p>
+                    </a>
+                  </li>
+                  <!-- end message -->
+                </ul>
+                <!-- /.menu -->
+              </li>
+             {% endfor %}
+
+             {% for post in request.user.profile.unread_islamic_studies_posts.all  %}		
+ 				
+              <li>
+                <!-- inner menu: contains the messages -->
+                <ul class="menu">
+                  <li><!-- start message -->
+                    <a href="{% url 'islamic_studies_post_detail' pk=post.pk %}">
+                      <div class="pull-left">
+                        <!-- User Image -->
+                      <i class="fa fa-user-circle fa-2x"></i>                        
+                      </div>
+                      <!-- Message title and timestamp -->
+                      <h4>
+                        {{post.author.first_name}} {{post.author.last_name}}
+                        <small><i class="fa fa-clock-o"></i> {{post.posted_date}} </small>
+                      </h4>
+                      <!-- The message -->
+                      <p>{{post.title}}</p>
+                    </a>
+                  </li>
+                  <!-- end message -->
+                </ul>
+                <!-- /.menu -->
+              </li>
+
+             {% endfor %}
+
+            </ul>
+          </li>
+          <!-- /.messages-menu -->
+
+          <!-- Notifications Menu -->
+          <li class="dropdown notifications-menu">
+            <!-- Menu toggle button -->
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-comment-o"></i>
+
+             {% if request.user.profile.unread_quran_comments.count > 0 or request.user.profile.unread_islamic_studies_comments.count > 0 %}
+
+              <span class="label label-primary">
+	              	{{request.user.profile.unread_quran_comments.count|add:request.user.profile.unread_islamic_studies_comments.count}}      
+              </span>
+
+             {% endif %}
+
+            </a>
+            <ul class="dropdown-menu">
+              <li class="header">You have {{request.user.profile.unread_quran_comments.count|add:request.user.profile.unread_islamic_studies_comments.count}} unread comments</li>
+
+           {% for comment in request.user.profile.unread_quran_comments.all %}
+              	
+              <li>
+                <!-- Inner Menu: contains the notifications -->
+                <ul class="menu">
+                  <li><!-- start notification -->
+                    <a href="{% url 'quran_post_detail' pk=comment.post.pk %}">
+                      <i class="fa fa-weixin text-aqua"></i> {{comment.author.first_name}} {{comment.author.last_name}} commented on <i>{{comment.post.title}}</i>
+                    </a>
+                  </li>
+                  <!-- end notification -->
+                </ul>
+              </li>
+
+            {% endfor %}
+
+            {% for comment in request.user.profile.unread_islamic_studies_comments.all %}
+              	
+              <li>
+                <!-- Inner Menu: contains the notifications -->
+                <ul class="menu">
+                  <li><!-- start notification -->
+                    <a href="{% url 'islamic_studies_post_detail' pk=comment.post.pk %}">
+                      <i class="fa fa-weixin text-aqua"></i> {{comment.author.first_name}} {{comment.author.last_name}} commented on <i>{{comment.post.title}}</i>
+                    </a>
+                  </li>
+                  <!-- end notification -->
+                </ul>
+              </li>
+
+           {% endfor %}
+
+            </ul>
+          </li>
+
+       <li class="dropdown notifications-menu">
+            <!-- Menu toggle button -->              
+        
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-bell-o"></i> 
+
+            {% if request.user.profile.unseen_quran_exams.count > 0 or request.user.profile.unseen_islamic_studies_exams.count > 0 %}
+
+              <span class="label label-warning">
+                  {{request.user.profile.unseen_quran_exams.count|add:request.user.profile.unseen_islamic_studies_exams.count}} </span>
+          
+            
+            {% endif %}
+
+             </a>
+
+            <ul class="dropdown-menu">
+              <li class="header">You have {{request.user.profile.unseen_quran_exams.count|add:request.user.profile.unseen_islamic_studies_exams.count}} notifications.</li>
+
+           {% for exam in request.user.profile.unseen_quran_exams.all %}
+                
+              <li>
+                <!-- Inner Menu: contains the notifications -->
+                <ul class="menu">
+                  <li><!-- start notification -->
+                    <a href="{% url 'student_detail' username=request.user.username %}">
+                      <i class="fa fa-pencil text-yellow"></i> Your Quran teacher posted an exam score for Exam <i>{{exam.exam_number}}</i>
+                    </a>
+                  </li>
+                  <!-- end notification -->
+                </ul>
+              </li>
+
+            {% endfor %}
+
+            {% for exam in request.user.profile.unseen_islamic_studies_exams.all %}
+                
+              <li>
+                <!-- Inner Menu: contains the notifications -->
+                <ul class="menu">
+                  <li><!-- start notification -->
+                    <a href="{% url 'student_detail' username=request.user.username %}">
+                     <i class="fa fa-pencil text-yellow"></i> Your Islamic Studies teacher posted an exam score for Exam <i>{{exam.exam_number}}</i>
+                    </a>
+                  </li>
+                  <!-- end notification -->
+                </ul>
+              </li>
+
+           {% endfor %}
+
+            </ul>
+         </li>
+
+          <!-- User Account Menu -->
+          <li class="dropdown user user-menu">
+            <!-- Menu Toggle Button -->
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <!-- The user image in the navbar-->
+              <i class="fa fa-user-circle"></i>                                                                                 <!-- hidden-xs hides the username on small devices so only the image appears. -->
+              <span class="hidden-xs">{{request.user.first_name}} {{request.user.last_name}}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- The user image in the menu -->
+              <li class="user-header">
+                <i class="fa fa-user-circle fa-4x"></i>  
+
+                <p>
+                  {{request.user.first_name}} {{request.user.last_name}}
+                </p>
+              </li>
+
+              <!--
+
+              <li class="user-body">
+                <div class="row">
+                  <div class="col-xs-4 text-center">
+                    <a href="#">Posts</a>
+                  </div>
+                  <div class="col-xs-4 text-center">
+                    <a href="#">Attendance</a>
+                  </div>
+                  <div class="col-xs-4 text-center">
+                    <a href="#">Results</a>
+                  </div>
+                </div>
+              </li>
+
+                -->
+
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <div class="pull-left">
+                  <a href="{% url 'dashboard' %}" class="btn btn-default btn-flat">Home</a>
+                </div>
+                <div class="pull-right">
+                  <a href="{% url 'logout' %}" class="btn btn-default btn-flat">Sign out</a>
+                </div>
+              </li>
+            </ul>
+          </li>
+          <!-- Control Sidebar Toggle Button 
+          <li>
+            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+          </li>
+          -->
+        </ul>
+      </div>
+    </nav>
+
+
+
+
+
+
+</body>
+</html>

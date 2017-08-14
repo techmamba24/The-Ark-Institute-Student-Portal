@@ -1,0 +1,57 @@
+{% extends "dashboardbase.html" %}
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static "styling.css" %}">
+</head>
+
+{% block title %}
+	<div class="container-fluid">
+
+	<div class="text-center">
+		<h2>
+			Create a Post
+		</h2>
+	</div>
+
+    <div class="pull-right">
+        <a href="{% url 'quran_post_list' %}" class="btn btn-primary">Go back</a>
+    </div>
+ 	</div>
+
+    <div class="alert alert-danger alert-dismissible" style="margin-top: 10px;">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="icon fa fa-warning"></i>
+                Once you create a post, you will not be able to delete it. Double click and highlight your message text if you wish to style it.
+    </div>
+
+
+{% endblock  %}
+
+<body>
+
+{% block maincontent %}
+
+
+
+
+<div class="well posts">
+    <form method="POST" class="post-form" enctype="multipart/form-data">
+  
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit" class="save btn btn-danger">Post</button>
+  
+  </form>
+</div>	 
+
+
+    <script>var editor = new MediumEditor('.editable');</script>
+
+{% endblock  %}
+
+</body>
+</html>

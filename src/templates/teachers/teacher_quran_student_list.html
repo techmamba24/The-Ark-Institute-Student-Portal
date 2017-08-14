@@ -1,0 +1,66 @@
+{% extends "dashboardbase.html" %}
+
+{% block title %}
+{% if user.profile.role == 'Teacher' %}
+
+<div class="text-center">
+    <h2>
+    Quran {{user.profile.quran_class}}
+  </h2>
+</div>
+
+{% endif %}
+
+{% endblock  %}
+
+{% block maincontent %}
+{% if user.profile.role == 'Teacher' %}
+	
+
+	  <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="example2" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email Adress</th>            
+                  <th>Post Exam Score</th> 
+                  <th>View Exam Scores</th>   
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in object_list  %}
+                	<tr>
+                		<td>{{user.first_name}}</td>
+                		<td>{{user.last_name}}</td>
+                	    <td>{{user.email}}</td>                
+                  		<td><a href="{% url 'quran_score_add' student=user %}" class="btn btn-danger">Click Here</a></td>
+                  		<td><a href="{% url 'student_detail' username=user.username%}" class="btn btn-primary">Click Here</a></td>
+
+                	</tr>
+                	
+                {% endfor %}
+                
+                </tbody>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+{% else %}
+
+<p>Must be a teacher to view this page</p>
+
+{% endif %}
+{% endblock  %}

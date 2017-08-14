@@ -1,0 +1,44 @@
+{% extends "dashboardbase.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}
+	<div class="container-fluid">
+
+	<div class="text-center">
+		<h2>
+			Write a Comment
+		</h2>
+	</div>
+
+    <div class="pull-right">
+        <a href="{% url 'quran_post_list' %}" class="btn btn-primary">Go back</a>
+    </div>
+ 	</div>
+
+        <div class="alert alert-danger alert-dismissible" style="margin-top: 10px;">
+
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="icon fa fa-warning"></i>
+                Once you post a comment, you will not be able to delete it. Double click and highlight your comment text if you wish to style it.
+        </div>
+
+{% endblock  %}
+
+{% block maincontent %}
+
+<div class="well posts">
+
+    <form method="POST" class="post-form">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit" class="save btn btn-danger">Comment</button>
+    </form>
+
+
+</div>	 
+
+
+    <script>var editor = new MediumEditor('.editable');</script>
+
+{% endblock  %}

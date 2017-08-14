@@ -1,0 +1,40 @@
+{% extends "dashboardbase.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}
+    <div class="container-fluid">
+    <div class="text-center">
+	<h2>
+		Islamic Studies {{request.user.profile.islamic_studies_class}}: Class Posts
+	</h2>
+    </div>
+        <div class="pull-right">
+            <a href="{% url 'islamic_studies_post_new' %}" class="btn btn-primary">Create Post</a>
+        </div>
+    </div>
+{% endblock  %}
+
+{% block maincontent %}
+	 
+    {% for post in object_list %}
+        <div class="well posts">
+            <h1><a href="{% url 'islamic_studies_post_detail' pk=post.pk %}" style="color:#dd4b39;">{{ post.title }}</a></h1>
+            <p><b>Posted by:</b> {{post.author.first_name}} {{post.author.last_name}}</p>
+            <p><b>Posted on:</b> {{ post.posted_date|date:"D M Y"}}</p>
+            <hr>
+            <h5>{{post.message|safe}}</h5>
+            <hr>
+            <a href="{% url 'islamic_studies_post_detail' pk=post.pk %}">Comments: {{ post.islamic_studies_comments.count }}</a>
+            <a href="{% url 'comment_islamic_studies_post' pk=post.pk %}" style="margin-left: 5px;" class="btn btn-danger pull-right">Comment</a>
+            <a href="{% url 'islamic_studies_post_detail' pk=post.pk %}" class="btn btn-success pull-right">View</a>
+        </div>
+
+    {% empty %}
+    <p>There are no posts to show.</p>
+
+    {% endfor %}
+
+
+
+{% endblock  %}

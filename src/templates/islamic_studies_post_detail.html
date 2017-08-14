@@ -1,0 +1,66 @@
+{% extends 'dashboardbase.html' %}
+
+{% block title %}
+ <div class="container-fluid">
+  <div class="text-center">
+      <h2>
+        Islamic Studies
+      </h2>
+    </div>
+      <div class="pull-right">
+        <a href="{% url 'islamic_studies_post_list' %}" class="btn btn-primary">All Posts</a>
+      </div>
+ </div>
+
+{% endblock  %}
+
+{% block maincontent %}
+
+<div class="well posts">
+
+        <h1 class='posttitle loader'>{{ object.title }}</h1>
+
+        <hr>
+        <p><b>Posted by:</b> {{object.author.first_name}} {{object.author.last_name}}</p>
+        <p><b>Posted on:</b> {{ object.posted_date }} </p>
+        {% if object.upload %}<p><b>Attachment:</b>
+          <a href="{{object.upload.url}}">{{object.upload}}</a>
+        {% endif %}
+        </p>
+        <hr>
+
+        <p> {{object.message|safe|linebreaksbr }} </p>
+
+      
+
+</div>
+
+<a href="{% url 'comment_islamic_studies_post' pk=object.pk %}" class="btn btn-danger pull-right">Comment</a>
+
+<br>
+<br>
+<h2 style="text-align: center;">Comments</h2>
+
+<hr>
+
+  {% for comment in object.islamic_studies_comments.all %}
+
+  
+  <div class="col-sm-9 col-sm-offset-1 posts">
+
+      <p><strong>{{ comment.author.first_name }} {{ comment.author.last_name }}</strong></p>
+      <p>{{ comment.posted_date }}</p>
+      <hr>
+      <p>{{ comment.comment|safe|linebreaks }}</p>    
+
+  </div>
+
+
+
+  {% empty %}
+    <p>No comments posted.</p>
+   
+  {% endfor %}
+
+
+{% endblock %}
