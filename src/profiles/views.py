@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect, HttpResponse, 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.models import User
-from . forms import QuranPostForm, QuranCommentForm, IslamicStudiesPostForm, IslamicStudiesCommentForm, QuranExamForm, IslamicStudiesExamForm
-from profiles.models import QuranPost, QuranComment, IslamicStudiesPost,IslamicStudiesComment, Profile, QuranExam, IslamicStudiesExam
+from . forms import QuranPostForm, QuranCommentForm, IslamicStudiesPostForm, IslamicStudiesCommentForm, QuranExamForm, IslamicStudiesExamForm, QuranAttendanceForm
+from profiles.models import QuranPost, QuranComment, IslamicStudiesPost,IslamicStudiesComment, Profile, QuranExam, IslamicStudiesExam, SchoolWeek, QuranAttendance
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -29,30 +29,52 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		recent_islamic_studies_comments = IslamicStudiesComment.objects.filter(post__class_level=self.request.user.profile.islamic_studies_class)
 		recent_quran_exams = QuranExam.objects.filter(student=self.request.user)
 		recent_islamic_studies_exams = IslamicStudiesExam.objects.filter(student=self.request.user)
+		# recent_quran_attendance = QuranAttendance.objects.filter(student=self.request.user)
 		recent_quran_activity = sorted(chain(recent_quran_posts,recent_quran_comments, recent_quran_exams), key=attrgetter('posted_date'))
 		recent_islamic_studies_activity = sorted(chain(recent_islamic_studies_posts, recent_islamic_studies_comments, recent_islamic_studies_exams), key=attrgetter('posted_date'))
 		context['recent_quran'] = list(reversed(recent_quran_activity[-3:]))
 		context['recent_islamic_studies'] = list(reversed(recent_islamic_studies_activity[-3:]))
-		print(context)
+		# print(context)
 		
-		userobj = User.objects.filter(username__iexact=self.request.user.username).first()
+		if self.request.user.profile.role == 'Student':
+			userobj = User.objects.filter(username__iexact=self.request.user.username).first()
 
-		quran_results = userobj.quran_exam_scores.all()
+			quran_results = userobj.quran_exam_scores.all()
 
-		if quran_results.exists():
-			quran_average = 0
-			for result in quran_results:
-				quran_average += result.exam_score
-			quran_average = quran_average/len(quran_results)
-			context['quran_average'] = quran_average
+			if quran_results.exists():
+				quran_average = 0
+				for result in quran_results:
+					quran_average += result.exam_score
+				quran_average = quran_average/len(quran_results)
+				context['quran_average'] = quran_average
 
-		islamic_studies_results = userobj.islamic_studies_exam_scores.all()
-		if islamic_studies_results.exists():
-			islamic_studies_average = 0
-			for result in islamic_studies_results:
-				islamic_studies_average += result.exam_score
-			islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
-			context['islamic_studies_average'] = islamic_studies_average
+			islamic_studies_results = userobj.islamic_studies_exam_scores.all()
+			if islamic_studies_results.exists():
+				islamic_studies_average = 0
+				for result in islamic_studies_results:
+					islamic_studies_average += result.exam_score
+				islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
+				context['islamic_studies_average'] = islamic_studies_average
+		
+		elif self.request.user.profile.role == 'Teacher':
+
+			quran_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class)
+			islamic_studies_results = IslamicStudiesExam.objects.filter(class_level=self.request.user.profile.islamic_studies_class)
+
+			if quran_results.exists():
+				quran_average = 0
+				for result in quran_results:
+					quran_average += result.exam_score
+				quran_average = quran_average/len(quran_results)
+				context['quran_average'] = quran_average
+
+			if islamic_studies_results.exists():
+				islamic_studies_average = 0
+				for result in islamic_studies_results:
+					islamic_studies_average += result.exam_score
+				islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
+				context['islamic_studies_average'] = islamic_studies_average
+
 
 		return context
 
@@ -373,4 +395,83 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 	# 	student = self.kwargs['student']
 	# 	userobj = User.objects.filter(username__iexact=student).first()
 	# 	return QuranExam.objects.filter(student__username=userobj.username).order_by('posted_date')
- 
+
+class QuranSchoolWeeksView(LoginRequiredMixin, ListView):
+	model = SchoolWeek
+	template_name = 'quran_school_weeks.html'
+	# def get_queryset(self):
+	# 	return Schoo.objects.filter(class_level=self.request.user.profile.quran_class).order_by('-posted_date')
+
+class QuranAttendanceList(LoginRequiredMixin, ListView):
+	model = QuranAttendance
+	template_name = 'teachers/quran_attendance_list.html'
+
+	def get_context_data(self,*args,**kwargs):
+		# print(**kwargs)
+		context = super(QuranAttendanceList,self).get_context_data(*args,**kwargs)
+		week_id = self.kwargs['pk']
+		week = SchoolWeek.objects.filter(pk=week_id).first()
+		context['week_number'] = week.week_number
+		context['week_date'] = week.date
+		return context
+
+
+	def get_queryset(self):
+		return QuranAttendance.objects.filter(student__profile__quran_class=self.request.user.profile.quran_class, week__pk=self.kwargs['pk'])
+
+
+
+
+class QuranAttendanceUpdate(LoginRequiredMixin,UpdateView):
+
+	model = QuranAttendance
+	template_name = 'teachers/quran_attendance_update.html'
+	form_class = QuranAttendanceForm
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(QuranAttendanceUpdate,self).get_context_data(*args,**kwargs)
+		student = self.kwargs['student']
+		userobj = User.objects.filter(username__iexact=student).first()
+		attd_id = self.kwargs['pk']
+		week = QuranAttendance.objects.filter(pk=attd_id).first().week
+		context['week_number'] = week.week_number
+		context['week_date'] = week.date
+		context['full_name'] = userobj.first_name+' '+userobj.last_name
+		context['userobj'] = userobj
+		return context
+
+	def form_valid(self,form):
+		context = self.get_context_data()
+		self.object = form.save(commit=False)
+		self.object.class_level = context['userobj'].profile.quran_class
+		self.object.save()
+		context['userobj'].profile.unseen_quran_attendance.add(self.object)
+		return super().form_valid(form)
+
+
+
+class QuranAttendanceStudentView(LoginRequiredMixin, ListView):
+
+	model = QuranAttendance
+	template_name = 'students/quran_attendance.html'
+
+	def get_queryset(self):
+		for attendance in self.request.user.profile.unseen_quran_attendance.all():
+			self.request.user.profile.unseen_quran_attendance.remove(attendance)
+
+		return QuranAttendance.objects.filter(student=self.request.user)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

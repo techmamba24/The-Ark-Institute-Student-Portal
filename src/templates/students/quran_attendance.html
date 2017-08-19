@@ -1,0 +1,60 @@
+{% extends "dashboardbase.html" %}
+
+{% block title %}
+
+
+<div class="container-fluid">
+
+<div class="text-center">
+    <h2>
+    Quran {{user.profile.quran_class}} Attendance
+  </h2>
+</div>
+
+
+</div>
+
+
+{% endblock  %}
+
+{% block maincontent %}
+	
+
+	  <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="example2" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Date</th>
+                  <th>Attendance</th>            
+                </tr>
+                </thead>
+                <tbody>
+                {% for entry in object_list  %}
+                	<tr>
+                		<td>{{entry.week.week_number}}</td>
+                		<td>{{entry.week.date}}</td>
+                	  <td>{{entry.attendance}}</td>                
+                	</tr>
+                	
+                {% endfor %}
+                
+                </tbody>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+
+{% endblock  %}

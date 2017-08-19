@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import QuranPost, QuranComment, IslamicStudiesPost,IslamicStudiesComment,QuranExam, IslamicStudiesExam
+from .models import QuranPost, QuranComment, IslamicStudiesPost,IslamicStudiesComment,QuranExam, IslamicStudiesExam, QuranAttendance
 
 
 class QuranPostForm(forms.ModelForm):
@@ -57,3 +57,9 @@ class IslamicStudiesExamForm(forms.ModelForm):
     class Meta:
         model = IslamicStudiesExam
         fields = ('exam_number','exam_score')
+
+class QuranAttendanceForm(forms.ModelForm):
+
+    class Meta:
+        model = QuranAttendance
+        fields = ('week','attendance',)

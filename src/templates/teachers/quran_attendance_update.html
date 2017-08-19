@@ -1,0 +1,57 @@
+{% extends "dashboardbase.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}
+{% if user.profile.role == 'Teacher'  %}
+
+<h4 class="pull-left">Quran Attendance: Week {{week_number}}: {{week_date}}</h5>
+<br>
+<br>
+
+	<div class="container-fluid">
+
+	<div class="text-center">
+		<h2>
+			Update Attendance for {{full_name}}
+		</h2>
+	</div>
+
+    <div class="pull-right">
+        <a href="{% url 'quran_school_weeks' %}" class="btn btn-primary">Quran Class Attendance</a>
+    </div>
+ 	</div>
+
+{% endif %}
+
+{% endblock  %}
+
+{% block maincontent %}
+
+{% if user.profile.role == 'Teacher' %}
+    
+
+
+<div class="well posts">
+
+
+  <div class="alert alert-danger alert-dismissible" style="margin-top: 10px;">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="icon fa fa-warning"></i>
+                Please do not press Update more than once. Give it a few seconds :)
+    </div>
+
+    <form method="POST" class="post-form">
+        {% csrf_token %}
+        {%bootstrap_form form%}
+        <button type="submit" class="save btn btn-danger">Update</button>
+    </form>
+
+
+</div>	 
+
+{% else %}
+<p>Must be a teacher to view this page</p>
+{% endif %}
+
+{% endblock  %}

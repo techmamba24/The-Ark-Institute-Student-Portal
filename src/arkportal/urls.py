@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.views.generic.base import TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
-from profiles.views import DashboardView, QuranClassListView, ISClassListView, QuranPostListView, QuranPostDetailView, QuranCreatePostView, add_comment_to_quran_post, IslamicStudiesPostListView, IslamicStudiesPostDetailView, IslamicStudiesCreatePostView, add_comment_to_islamic_studies_post, QuranTeacherStudentList, QuranExamScoreAdd, StudentDetail, QuranExamScoreUpdate, IslamicStudiesExamScoreAdd, IslamicStudiesTeacherStudentList, IslamicStudiesExamScoreUpdate
+from profiles.views import DashboardView, QuranClassListView, ISClassListView, QuranPostListView, QuranPostDetailView, QuranCreatePostView, add_comment_to_quran_post, IslamicStudiesPostListView, IslamicStudiesPostDetailView, IslamicStudiesCreatePostView, add_comment_to_islamic_studies_post, QuranTeacherStudentList, QuranExamScoreAdd, StudentDetail, QuranExamScoreUpdate, IslamicStudiesExamScoreAdd, IslamicStudiesTeacherStudentList, IslamicStudiesExamScoreUpdate,QuranSchoolWeeksView, QuranAttendanceList, QuranAttendanceUpdate, QuranAttendanceStudentView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -42,6 +42,11 @@ urlpatterns = [
     url(r'^islamic-studies-class-posts/create/$', IslamicStudiesCreatePostView.as_view(),name='islamic_studies_post_new'),
     url(r'^islamic-studies-class-posts/(?P<pk>\d+)/$', IslamicStudiesPostDetailView.as_view(),name='islamic_studies_post_detail'),
     url(r'^islamic-studies-class-posts/(?P<pk>\d+)/comment/$', add_comment_to_islamic_studies_post,name='comment_islamic_studies_post'),
+    url(r'^quran-class-students/attendance/$', QuranSchoolWeeksView.as_view(),name='quran_school_weeks'),
+    url(r'^quran-class-students/attendance/(?P<pk>\d+)/student-list/$', QuranAttendanceList.as_view(),name='quran_attendance_list'),
+    url(r'^quran-class-students/attendance/student-list/(?P<student>[\w-]+)/(?P<pk>\d+)$', QuranAttendanceUpdate.as_view(),name='quran_attendance_update'),
+    url(r'^quran-class/attendance/$', QuranAttendanceStudentView.as_view(),name='student_quran_attendance'),
+
 
 
 ]
