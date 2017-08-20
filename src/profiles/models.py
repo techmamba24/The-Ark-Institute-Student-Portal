@@ -7,6 +7,8 @@ from django.core.urlresolvers import reverse
 from . utils import code_generator
 from arkportal.settings.base import CLIENT_JSON
 from django.core.validators import MaxValueValidator
+from django.db import transaction
+
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -136,6 +138,8 @@ class Profile(models.Model):
 	unseen_quran_exams = models.ManyToManyField('profiles.QuranExam', related_name='unseen_quran_exams', blank=True)
 	unseen_islamic_studies_exams = models.ManyToManyField('profiles.IslamicStudiesExam', related_name='unseen_islamic_studies_exams', blank=True)
 	unseen_quran_attendance = models.ManyToManyField('profiles.QuranAttendance', related_name='unseen_quran_attendance', blank=True)
+	unseen_islamic_studies_attendance = models.ManyToManyField('profiles.IslamicStudiesAttendance', related_name='unseen_islamic_studies_attendance', blank=True)
+	populated = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.user.username
@@ -144,47 +148,76 @@ class Profile(models.Model):
 
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender,instance,created,**kwargs):
+
 	if created:
 		Profile.objects.create(user=instance)
 
-		if instance.profile.role == 'Student':
-			try:
-				# use creds to create a client to interact with the Google Drive API
-				scope = ['https://spreadsheets.google.com/feeds']
-				# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
-				# creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/aamel786/desktop/development/arkportal/src/templates/client_secret.json', scope)
-				creds = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_JSON, scope)
-				client = gspread.authorize(creds)
-				 
-				# Find a workbook by name and open the first sheet
-				# Make sure you use the rit name here.
-				sheet = client.open("Quran Exam Scores Sample").sheet1
-				sheet2 = client.open("IS Exam Scores Sample").sheet1
-				sheet3 = client.open("Quran Attendance Sample").sheet1
-				 
-				first_name = instance.first_name
-				last_name = instance.last_name
-				sheet.update_cell(instance.pk,1,first_name)
-				sheet.update_cell(instance.pk,2,last_name)
-				sheet.update_cell(instance.pk,3,instance.profile.quran_class)
-
-				sheet2.update_cell(instance.pk,1,first_name)
-				sheet2.update_cell(instance.pk,2,last_name)
-				sheet2.update_cell(instance.pk,3,instance.profile.islamic_studies_class)
-
-				sheet3.update_cell(instance.pk,1,first_name)
-				sheet3.update_cell(instance.pk,2,last_name)
-				sheet3.update_cell(instance.pk,3,instance.profile.quran_class)
-			
-			except BaseException:
-				return reverse('home')
-
-			weeks = SchoolWeek.objects.all()
-
-			for week in weeks:
-				QuranAttendance.objects.get_or_create(student=instance,week=week)
-
 	instance.profile.save()
+
+
+@receiver(post_save,sender=Profile)
+def misc_updates(sender,instance,created,**kwargs):
+	if instance.role == 'Student' and instance.populated is False:
+		try:
+			# print('HELLO')
+			# use creds to create a client to interact with the Google Drive API
+			scope = ['https://spreadsheets.google.com/feeds']
+			# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
+			# creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/aamel786/desktop/development/arkportal/src/templates/client_secret.json', scope)
+			creds = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_JSON, scope)
+			client = gspread.authorize(creds)
+			 
+			# Find a workbook by name and open the first sheet
+			# Make sure you use the rit name here.
+			sheet = client.open("Quran Exam Scores Sample").sheet1
+			sheet2 = client.open("IS Exam Scores Sample").sheet1
+			sheet3 = client.open("Quran Attendance Sample").sheet1
+			sheet4 = client.open("Islamic Studies Attendance Sample").sheet1
+
+				 
+			first_name = instance.user.first_name
+			last_name = instance.user.last_name
+			sheet.update_cell(instance.pk,1,first_name)
+			sheet.update_cell(instance.pk,2,last_name)
+			sheet.update_cell(instance.pk,3,instance.quran_class)
+
+			sheet2.update_cell(instance.pk,1,first_name)
+			sheet2.update_cell(instance.pk,2,last_name)
+			sheet2.update_cell(instance.pk,3,instance.islamic_studies_class)
+
+			sheet3.update_cell(instance.pk,1,first_name)
+			sheet3.update_cell(instance.pk,2,last_name)
+			sheet3.update_cell(instance.pk,3,instance.quran_class)
+
+			sheet4.update_cell(instance.pk,1,first_name)
+			sheet4.update_cell(instance.pk,2,last_name)
+			sheet4.update_cell(instance.pk,3,instance.islamic_studies_class)
+			
+		except BaseException:
+			return reverse('home')
+
+		weeks = SchoolWeek.objects.all()
+		q_attd = []
+		is_attd = []
+		for week in weeks:
+			# print('hi')
+			qattd = QuranAttendance(student=instance.user,week=week)
+			isattd = IslamicStudiesAttendance(student=instance.user,week=week)
+			q_attd.append(qattd)
+			is_attd.append(isattd)
+			# QuranAttendance.objects.create(student=instance.user,week=week)
+			# IslamicStudiesAttendance.objects.create(student=instance.user,week=week)
+
+		try:
+			with transaction.atomic():
+				QuranAttendance.objects.bulk_create(q_attd)
+				IslamicStudiesAttendance.objects.bulk_create(is_attd)
+		except BaseException:
+			pass
+
+		instance.populated = True
+		instance.save()
+
 
 class SchoolWeek(models.Model):
 	week_number = models.PositiveSmallIntegerField()
@@ -192,6 +225,9 @@ class SchoolWeek(models.Model):
 
 	def __str__(self):
 		return 'Week '+str(self.week_number)+': '+str(self.date)
+
+	class Meta:
+		unique_together = ('week_number','date')
 
 # @receiver(post_save, sender=SchoolWeek)
 # def create_user_attendances(sender,instance,created,**kwargs):
@@ -205,7 +241,7 @@ class SchoolWeek(models.Model):
 
 class QuranAttendance(models.Model):
 
-	week = models.ForeignKey(SchoolWeek,related_name='attendances')
+	week = models.ForeignKey(SchoolWeek,related_name='quran_attendances')
 
 	Q1 = 1
 	Q2 = 2
@@ -259,6 +295,7 @@ class QuranAttendance(models.Model):
 		return reverse('quran_attendance_list',kwargs={'pk':self.week.pk})
 
 
+
 @receiver(post_save, sender=QuranAttendance)
 def update_google_sheet_quran_attendance(sender,instance,created,**kwargs):
 	try:
@@ -279,6 +316,87 @@ def update_google_sheet_quran_attendance(sender,instance,created,**kwargs):
 
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})
+
+
+
+class IslamicStudiesAttendance(models.Model):
+
+	week = models.ForeignKey(SchoolWeek,related_name='islamic_studies_attendances')
+
+	IS1 = 1
+	IS2 = 2
+	IS3 = 3
+	IS4 = 4
+	IS5 = 5
+	IS6 = 6
+	IS7 = 7
+	IS8 = 8
+	IS9 = 9
+
+	IS_CHOICES = (
+			(IS1, 'IS1'),
+			(IS2, 'IS2'),
+			(IS3, 'IS3'),
+			(IS4, 'IS4'),
+			(IS5, 'IS5'),
+			(IS6, 'IS6'),
+			(IS7, 'IS7'),
+			(IS8, 'IS8'),
+			(IS9, 'IS9'),
+		)
+
+	class_level = models.PositiveSmallIntegerField(choices=IS_CHOICES,null=True,blank=True)
+	student = models.ForeignKey(User, limit_choices_to={'profile__role':'Student'},related_name='islamic_studies_attendance')
+
+	Present = 'Present'
+	Absent = 'Absent'
+	Tardy = 'Tardy'
+	NA = 'N/A'
+
+
+	Attendance_choices = (
+			(Present, 'Present'),
+			(Absent, 'Absent'),
+			(Tardy, 'Tardy'),
+			(NA, 'N/A')
+		)
+
+	attendance = models.CharField(choices=Attendance_choices, max_length=10)
+
+	posted_date = models.DateTimeField(default=timezone.now)
+
+	def __str__(self):
+		return self.student.first_name+' '+self.student.last_name+': '+str(self.week)+': '+self.attendance
+
+	class Meta:
+		unique_together = ('student','week')
+
+	def get_absolute_url(self):
+		return reverse('islamic_studies_attendance_list',kwargs={'pk':self.week.pk})
+
+
+@receiver(post_save, sender=IslamicStudiesAttendance)
+def update_google_sheet_islamic_studies_attendance(sender,instance,created,**kwargs):
+	try:
+		# use creds to create a client to interact with the Google Drive API
+		scope = ['https://spreadsheets.google.com/feeds']
+		# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
+		# creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/aamel786/desktop/development/arkportal/src/templates/client_secret.json', scope)
+		creds = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_JSON, scope)
+		client = gspread.authorize(creds)
+		 
+		# Find a workbook by name and open the first sheet
+		# Make sure you use the rit name here.
+		sheet = client.open("Islamic Studies Attendance Sample").sheet1
+		 
+		
+		sheet.update_cell(instance.student.pk,instance.week.week_number+7,instance.attendance)
+
+
+	except BaseException:
+		return reverse('student_detail',kwargs={'username':instance.student.username})
+
+
 
 class QuranExam(models.Model):
 

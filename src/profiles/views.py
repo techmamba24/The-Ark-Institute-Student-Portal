@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect, HttpResponse, 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.models import User
-from . forms import QuranPostForm, QuranCommentForm, IslamicStudiesPostForm, IslamicStudiesCommentForm, QuranExamForm, IslamicStudiesExamForm, QuranAttendanceForm
-from profiles.models import QuranPost, QuranComment, IslamicStudiesPost,IslamicStudiesComment, Profile, QuranExam, IslamicStudiesExam, SchoolWeek, QuranAttendance
+from . forms import QuranPostForm, QuranCommentForm, IslamicStudiesPostForm, IslamicStudiesCommentForm, QuranExamForm, IslamicStudiesExamForm, QuranAttendanceForm, IslamicStudiesAttendanceForm
+from profiles.models import QuranPost, QuranComment, IslamicStudiesPost,IslamicStudiesComment, Profile, QuranExam, IslamicStudiesExam, SchoolWeek, QuranAttendance, IslamicStudiesAttendance
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -463,7 +463,71 @@ class QuranAttendanceStudentView(LoginRequiredMixin, ListView):
 
 
 
+class IslamicStudiesSchoolWeeksView(LoginRequiredMixin, ListView):
+	model = SchoolWeek
+	template_name = 'islamic_studies_school_weeks.html'
+	# def get_queryset(self):
+	# 	return Schoo.objects.filter(class_level=self.request.user.profile.quran_class).order_by('-posted_date')
 
+
+class IslamicStudiesAttendanceList(LoginRequiredMixin, ListView):
+	model = IslamicStudiesAttendance
+	template_name = 'teachers/islamic_studies_attendance_list.html'
+
+	def get_context_data(self,*args,**kwargs):
+		# print(**kwargs)
+		context = super(IslamicStudiesAttendanceList,self).get_context_data(*args,**kwargs)
+		week_id = self.kwargs['pk']
+		week = SchoolWeek.objects.filter(pk=week_id).first()
+		context['week_number'] = week.week_number
+		context['week_date'] = week.date
+		return context
+
+
+	def get_queryset(self):
+		return IslamicStudiesAttendance.objects.filter(student__profile__islamic_studies_class=self.request.user.profile.islamic_studies_class, week__pk=self.kwargs['pk'])
+
+
+
+
+class IslamicStudiesAttendanceUpdate(LoginRequiredMixin,UpdateView):
+
+	model = IslamicStudiesAttendance
+	template_name = 'teachers/islamic_studies_attendance_update.html'
+	form_class = IslamicStudiesAttendanceForm
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(IslamicStudiesAttendanceUpdate,self).get_context_data(*args,**kwargs)
+		student = self.kwargs['student']
+		userobj = User.objects.filter(username__iexact=student).first()
+		attd_id = self.kwargs['pk']
+		week = IslamicStudiesAttendance.objects.filter(pk=attd_id).first().week
+		context['week_number'] = week.week_number
+		context['week_date'] = week.date
+		context['full_name'] = userobj.first_name+' '+userobj.last_name
+		context['userobj'] = userobj
+		return context
+
+	def form_valid(self,form):
+		context = self.get_context_data()
+		self.object = form.save(commit=False)
+		self.object.class_level = context['userobj'].profile.islamic_studies_class
+		self.object.save()
+		context['userobj'].profile.unseen_islamic_studies_attendance.add(self.object)
+		return super().form_valid(form)
+
+
+
+class IslamicStudiesAttendanceStudentView(LoginRequiredMixin, ListView):
+
+	model = IslamicStudiesAttendance
+	template_name = 'students/islamic_studies_attendance.html'
+
+	def get_queryset(self):
+		for attendance in self.request.user.profile.unseen_islamic_studies_attendance.all():
+			self.request.user.profile.unseen_islamic_studies_attendance.remove(attendance)
+
+		return IslamicStudiesAttendance.objects.filter(student=self.request.user)
 
 
 

@@ -138,34 +138,59 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <div class="box-body">
 
 
+
+         <strong><i class="fa fa-book margin-r-5"></i>Overall Average</strong>
+
+                <p class="text-muted">
+                    {% if overall_average  %}
+                    {{overall_average}}
+                      {% else %}
+                    Not yet available..
+                    {% endif %}
+                </p>
+
+           <hr>
+
+
            <strong><i class="fa fa-book margin-r-5"></i>Quran Exam Average</strong>
 
-          <p class="text-muted">
-              {% if quran_average  %}
-              {{quran_average}}
-                {% else %}
-              No results yet.
-              {% endif %}
-          </p>
+                <p class="text-muted">
+                    {% if quran_average  %}
+                    {{quran_average}}
+                      {% else %}
+                    No results yet.
+                    {% endif %}
+                </p>
 
               <hr>
+
+          <strong><i class="fa fa-users margin-r-5"></i>Quran Attendance Average</strong>
+
+                 <p class="text-muted">
+                      Not yet available.
+                    </p>
+           <hr>
 
              <strong><i class="fa fa-book margin-r-5"></i>Islamic Studies Exam Average</strong>
 
-   		 <p class="text-muted">
-              {% if islamic_studies_average  %}
-              {{islamic_studies_average}}
-                {% else %}
-              No results yet.
-              {% endif %}
-          </p>
+             		 <p class="text-muted">
+                        {% if islamic_studies_average  %}
+                        {{islamic_studies_average}}
+                          {% else %}
+                        No results yet.
+                        {% endif %}
+                    </p>
               <hr>
 
-            <strong><i class="fa fa-users margin-r-5"></i>Last Week's Attendance</strong>
+           
+          <strong><i class="fa fa-users margin-r-5"></i>Islamic Studies Attendance Average</strong>
 
-              <p class="text-muted">Not available.</p>
+                 <p class="text-muted">
+                      Not yet available.
+                    </p>
+           <hr>
 
-            <hr>
+
 
             </div>
             <!-- /.box-body -->

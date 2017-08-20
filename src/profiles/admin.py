@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from .models import Profile, QuranPost,QuranComment, IslamicStudiesPost, IslamicStudiesComment,QuranExam,IslamicStudiesExam, QuranAttendance, SchoolWeek
+from .models import Profile, QuranPost,QuranComment, IslamicStudiesPost, IslamicStudiesComment,QuranExam,IslamicStudiesExam, QuranAttendance, SchoolWeek, IslamicStudiesAttendance
 
 class ProfileInline(admin.StackedInline):
 	model = Profile
@@ -46,6 +46,7 @@ admin.site.register(IslamicStudiesComment)
 admin.site.register(QuranExam)
 admin.site.register(IslamicStudiesExam)
 admin.site.register(QuranAttendance)
+admin.site.register(IslamicStudiesAttendance)
 admin.site.register(SchoolWeek)
 
 

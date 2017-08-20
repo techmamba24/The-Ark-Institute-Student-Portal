@@ -81,7 +81,7 @@
                        <li><a href="{% url 'quran_school_weeks' %}">Quran {{user.profile.quran_class}}</a></li>
                     {% endif %}
                     {% if user.profile.islamic_studies_class  %}
-                        <li><a href="#">Islamic Studies {{user.profile.islamic_studies_class}}</a></li>
+                        <li><a href="{% url 'islamic_studies_school_weeks' %}">Islamic Studies {{user.profile.islamic_studies_class}}</a></li>
                     {% endif %}
             </ul>
           </li>
@@ -103,7 +103,7 @@
                        <li><a href="{% url 'student_quran_attendance' %}">Quran {{user.profile.quran_class}}</a></li>
                     {% endif %}
                     {% if user.profile.islamic_studies_class  %}
-                        <li><a href="#">Islamic Studies {{user.profile.islamic_studies_class}}</a></li>
+                        <li><a href="{% url 'student_islamic_studies_attendance' %}">Islamic Studies {{user.profile.islamic_studies_class}}</a></li>
                     {% endif %}
             </ul>
 
