@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.views.generic.base import TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
-from profiles.views import DashboardView, QuranClassListView, ISClassListView, QuranPostListView, QuranPostDetailView, QuranCreatePostView, add_comment_to_quran_post, IslamicStudiesPostListView, IslamicStudiesPostDetailView, IslamicStudiesCreatePostView, add_comment_to_islamic_studies_post, QuranTeacherStudentList, QuranExamScoreAdd, StudentDetail, QuranExamScoreUpdate, IslamicStudiesExamScoreAdd, IslamicStudiesTeacherStudentList, IslamicStudiesExamScoreUpdate,QuranSchoolWeeksView, QuranAttendanceList, QuranAttendanceUpdate, QuranAttendanceStudentView, IslamicStudiesSchoolWeeksView, IslamicStudiesAttendanceList, IslamicStudiesAttendanceUpdate, IslamicStudiesAttendanceStudentView
+from profiles.views import DashboardView, QuranClassListView, ISClassListView, QuranPostListView, QuranPostDetailView, QuranCreatePostView, add_comment_to_quran_post, IslamicStudiesPostListView, IslamicStudiesPostDetailView, IslamicStudiesCreatePostView, add_comment_to_islamic_studies_post, QuranTeacherStudentList, QuranExamScoreAdd, StudentDetail, TeacherDetail, QuranExamScoreUpdate, IslamicStudiesExamScoreAdd, IslamicStudiesTeacherStudentList, IslamicStudiesExamScoreUpdate,QuranSchoolWeeksView, QuranAttendanceList, QuranAttendanceUpdate, QuranAttendanceStudentView, IslamicStudiesSchoolWeeksView, IslamicStudiesAttendanceList, IslamicStudiesAttendanceUpdate, IslamicStudiesAttendanceStudentView, QuranExamStudentView, IslamicStudiesExamStudentView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^logout/$', LogoutView.as_view(),name='logout'),
     url(r'^dashboard/$', DashboardView.as_view(),name='dashboard'),
     url(r'^students/(?P<username>[\w-]+)/$', StudentDetail.as_view(),name='student_detail'),
+    url(r'^teahcers/(?P<username>[\w-]+)/$', TeacherDetail.as_view(),name='teacher_detail'),
     url(r'^quran-class-roster/$', QuranClassListView.as_view(),name='qroster'),
     url(r'^islamic-studies-class-roster/$', ISClassListView.as_view(),name='isroster'),
     url(r'^quran-class-students/$', QuranTeacherStudentList.as_view(),name='quran_student_list'),
@@ -46,8 +47,11 @@ urlpatterns = [
     url(r'^quran-class-students/attendance/(?P<pk>\d+)/student-list/$', QuranAttendanceList.as_view(),name='quran_attendance_list'),
     url(r'^quran-class-students/attendance/student-list/(?P<student>[\w-]+)/(?P<pk>\d+)$', QuranAttendanceUpdate.as_view(),name='quran_attendance_update'),
     url(r'^quran-class/attendance/$', QuranAttendanceStudentView.as_view(),name='student_quran_attendance'),
+    url(r'^quran-class/exam-results/$', QuranExamStudentView.as_view(),name='student_quran_exams'),
     url(r'^islamic-studies-class-students/attendance/$', IslamicStudiesSchoolWeeksView.as_view(),name='islamic_studies_school_weeks'),
     url(r'^islamic-studies-class-students/attendance/(?P<pk>\d+)/student-list/$', IslamicStudiesAttendanceList.as_view(),name='islamic_studies_attendance_list'),
     url(r'^islamic-studies-class-students/attendance/student-list/(?P<student>[\w-]+)/(?P<pk>\d+)$', IslamicStudiesAttendanceUpdate.as_view(),name='islamic_studies_attendance_update'),
     url(r'^islamic-studies-class/attendance/$', IslamicStudiesAttendanceStudentView.as_view(),name='student_islamic_studies_attendance'),
+    url(r'^islamic-studies-class/exam-results/$', IslamicStudiesExamStudentView.as_view(),name='student_islamic_studies_exams'),
+
 ]

@@ -135,7 +135,28 @@
 
       {% if request.user.profile.role == 'Student' %}
          
-         <li> <a href="{% url 'student_detail' username=request.user.username %}"><i class="fa fa-book"></i> <span>Exam Scores</span></a></li>
+        <li class="treeview">
+
+          <a href="#"><i class="fa fa-book"></i> <span>Exam Scores</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+
+          <ul class="treeview-menu">
+          
+                  {% if user.profile.quran_class %}
+                     <li><a href="{% url 'student_quran_exams' %}">Quran {{user.profile.quran_class}}</a></li>
+                  {% endif %}
+                  
+                  {% if user.profile.islamic_studies_class  %}
+                      <li><a href="{% url 'student_islamic_studies_exams' %}">Islamic Studies {{user.profile.islamic_studies_class}}</a></li>
+                  {% endif %}
+
+          </ul>
+
+        </li>
+
      
       {% endif %}
 

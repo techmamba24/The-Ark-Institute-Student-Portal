@@ -16,6 +16,8 @@ from django.utils import timezone
 
 User = get_user_model()
 
+weekcount = 0
+
 # Create your views here.
 class DashboardView(LoginRequiredMixin, TemplateView):
 	template_name = 'dashboardhome.html'
@@ -34,47 +36,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 		recent_islamic_studies_activity = sorted(chain(recent_islamic_studies_posts, recent_islamic_studies_comments, recent_islamic_studies_exams), key=attrgetter('posted_date'))
 		context['recent_quran'] = list(reversed(recent_quran_activity[-3:]))
 		context['recent_islamic_studies'] = list(reversed(recent_islamic_studies_activity[-3:]))
-		# print(context)
-		
-		if self.request.user.profile.role == 'Student':
-			userobj = User.objects.filter(username__iexact=self.request.user.username).first()
-
-			quran_results = userobj.quran_exam_scores.all()
-
-			if quran_results.exists():
-				quran_average = 0
-				for result in quran_results:
-					quran_average += result.exam_score
-				quran_average = quran_average/len(quran_results)
-				context['quran_average'] = quran_average
-
-			islamic_studies_results = userobj.islamic_studies_exam_scores.all()
-			if islamic_studies_results.exists():
-				islamic_studies_average = 0
-				for result in islamic_studies_results:
-					islamic_studies_average += result.exam_score
-				islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
-				context['islamic_studies_average'] = islamic_studies_average
-		
-		elif self.request.user.profile.role == 'Teacher':
-
-			quran_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class)
-			islamic_studies_results = IslamicStudiesExam.objects.filter(class_level=self.request.user.profile.islamic_studies_class)
-
-			if quran_results.exists():
-				quran_average = 0
-				for result in quran_results:
-					quran_average += result.exam_score
-				quran_average = quran_average/len(quran_results)
-				context['quran_average'] = quran_average
-
-			if islamic_studies_results.exists():
-				islamic_studies_average = 0
-				for result in islamic_studies_results:
-					islamic_studies_average += result.exam_score
-				islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
-				context['islamic_studies_average'] = islamic_studies_average
-
 
 		return context
 
@@ -342,7 +303,6 @@ class IslamicStudiesExamScoreUpdate(LoginRequiredMixin,UpdateView):
 		return super().form_valid(form)
 
 
-#TRANSFORM THIS INTO A DETAIL VIEW SO CAN USE GET OBJECT METHOD!!
 class StudentDetail(LoginRequiredMixin,DetailView):
 	template_name = 'student_detail.html'
 
@@ -374,11 +334,34 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 			islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
 			context['islamic_studies_average'] = islamic_studies_average
 
-		for exam in self.request.user.profile.unseen_quran_exams.all():
-			self.request.user.profile.unseen_quran_exams.remove(exam)
+		quran_attendance_absent = userobj.quran_attendance.filter(attendance='Absent').count()
+		quran_attendance_present = userobj.quran_attendance.filter(attendance='Present').count()
+		quran_attendance_tardy = userobj.quran_attendance.filter(attendance='Tardy').count()
+		total_quran_attendance = quran_attendance_present + quran_attendance_absent + quran_attendance_tardy
 
-		for exam in self.request.user.profile.unseen_islamic_studies_exams.all():
-			self.request.user.profile.unseen_islamic_studies_exams.remove(exam)
+		if total_quran_attendance > 0:
+
+			quran_attendance_average = ( quran_attendance_present - (quran_attendance_tardy//2) ) / total_quran_attendance
+
+			context['quran_attendance_average'] = quran_attendance_average*100
+
+		islamic_studies_attendance_absent = userobj.islamic_studies_attendance.filter(attendance='Absent').count()
+		islamic_studies_attendance_present = userobj.islamic_studies_attendance.filter(attendance='Present').count()
+		islamic_studies_attendance_tardy = userobj.islamic_studies_attendance.filter(attendance='Tardy').count()
+		total_islamic_studies_attendance = islamic_studies_attendance_present + islamic_studies_attendance_absent + islamic_studies_attendance_tardy
+
+		if total_islamic_studies_attendance > 0:
+
+			islamic_studies_attendance_average = ( islamic_studies_attendance_present - (islamic_studies_attendance_tardy//2) ) / total_islamic_studies_attendance
+
+			context['islamic_studies_attendance_average'] = islamic_studies_attendance_average*100
+
+		if self.request.user.profile.role == 'Student':
+			for exam in self.request.user.profile.unseen_quran_exams.all():
+				self.request.user.profile.unseen_quran_exams.remove(exam)
+
+			for exam in self.request.user.profile.unseen_islamic_studies_exams.all():
+				self.request.user.profile.unseen_islamic_studies_exams.remove(exam)
 
 		return context
 	# 	context['full_name'] = userobj.first_name+' '+userobj.last_name
@@ -395,6 +378,95 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 	# 	student = self.kwargs['student']
 	# 	userobj = User.objects.filter(username__iexact=student).first()
 	# 	return QuranExam.objects.filter(student__username=userobj.username).order_by('posted_date')
+
+
+class TeacherDetail(LoginRequiredMixin,DetailView):
+	template_name = 'teacher_detail.html'
+
+	def get_object(self):
+		username = self.kwargs.get('username')
+		if not username:
+			raise Http404
+		return get_object_or_404(User, username__iexact=username, profile__role='Teacher')
+
+
+	def get_context_data(self,*args,**kwargs):
+
+		context = super(TeacherDetail, self).get_context_data(*args,**kwargs)
+
+		if self.request.user.profile.quran_class:
+
+			quran_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class)
+
+			if quran_results.exists():
+				quran_average = 0
+				for result in quran_results:
+					quran_average += result.exam_score
+				quran_average = quran_average/len(quran_results)
+				context['quran_average'] = quran_average
+
+
+			quran_attendance_present = QuranAttendance.objects.filter(class_level=self.request.user.profile.quran_class,attendance='Present').count()
+			quran_attendance_tardy = QuranAttendance.objects.filter(class_level=self.request.user.profile.quran_class,attendance='Tardy').count()
+			quran_attendance_absent = QuranAttendance.objects.filter(class_level=self.request.user.profile.quran_class,attendance='Absent').count()
+			total_quran_attendance = quran_attendance_present + quran_attendance_absent + quran_attendance_tardy
+
+			if total_quran_attendance > 0:
+
+				quran_attendance_average = ( quran_attendance_present - (quran_attendance_tardy//2) ) / total_quran_attendance
+
+				context['quran_attendance_average'] = quran_attendance_average*100
+
+			quran_exam1_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class, exam_number=1)
+			quran_exam2_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class, exam_number=2)
+			quran_exam3_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class, exam_number=3)
+			
+			if quran_exam1_results.exists():
+				context['quran_exam1_results'] = quran_exam1_results
+			if quran_exam2_results.exists():
+				context['quran_exam2_results'] = quran_exam2_results	
+			if quran_exam3_results.exists():
+				context['quran_exam3_results'] = quran_exam3_results	
+
+
+		if self.request.user.profile.islamic_studies_class:
+
+			islamic_studies_results = IslamicStudiesExam.objects.filter(class_level=self.request.user.profile.islamic_studies_class)
+
+			if islamic_studies_results.exists():
+				islamic_studies_average = 0
+				for result in islamic_studies_results:
+					islamic_studies_average += result.exam_score
+				islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
+				context['islamic_studies_average'] = islamic_studies_average
+
+
+
+			islamic_studies_attendance_present = IslamicStudiesAttendance.objects.filter(class_level=self.request.user.profile.islamic_studies_class,attendance='Present').count()
+			islamic_studies_attendance_tardy = IslamicStudiesAttendance.objects.filter(class_level=self.request.user.profile.islamic_studies_class,attendance='Tardy').count()
+			islamic_studies_attendance_absent = IslamicStudiesAttendance.objects.filter(class_level=self.request.user.profile.islamic_studies_class,attendance='Absent').count()
+			total_islamic_studies_attendance = islamic_studies_attendance_present + islamic_studies_attendance_absent + islamic_studies_attendance_tardy
+
+			if total_islamic_studies_attendance > 0:
+
+				islamic_studies_attendance_average = ( islamic_studies_attendance_present - (islamic_studies_attendance_tardy//2) ) / total_islamic_studies_attendance
+
+				context['islamic_studies_attendance_average'] = islamic_studies_attendance_average*100
+
+
+			islamic_studies_exam1_results = IslamicStudiesExam.objects.filter(class_level=self.request.user.profile.islamic_studies_class, exam_number=1)
+			islamic_studies_exam2_results = IslamicStudiesExam.objects.filter(class_level=self.request.user.profile.islamic_studies_class, exam_number=2)
+			islamic_studies_exam3_results = IslamicStudiesExam.objects.filter(class_level=self.request.user.profile.islamic_studies_class, exam_number=3)
+			
+			if islamic_studies_exam1_results.exists():
+				context['islamic_studies_exam1_results'] = islamic_studies_exam1_results
+			if islamic_studies_exam2_results.exists():
+				context['islamic_studies_exam2_results'] = islamic_studies_exam2_results	
+			if islamic_studies_exam3_results.exists():
+				context['islamic_studies_exam3_results'] = islamic_studies_exam3_results
+
+		return context
+
 
 class QuranSchoolWeeksView(LoginRequiredMixin, ListView):
 	model = SchoolWeek
@@ -528,6 +600,30 @@ class IslamicStudiesAttendanceStudentView(LoginRequiredMixin, ListView):
 			self.request.user.profile.unseen_islamic_studies_attendance.remove(attendance)
 
 		return IslamicStudiesAttendance.objects.filter(student=self.request.user)
+
+
+class QuranExamStudentView(LoginRequiredMixin, ListView):
+
+	model = QuranExam
+	template_name = 'students/quran_exam_scores.html'
+
+	def get_queryset(self):
+		for exam in self.request.user.profile.unseen_quran_exams.all():
+			self.request.user.profile.unseen_quran_exams.remove(exam)
+
+		return QuranExam.objects.filter(student=self.request.user)
+
+
+class IslamicStudiesExamStudentView(LoginRequiredMixin, ListView):
+
+	model = IslamicStudiesExam
+	template_name = 'students/islamic_studies_exam_scores.html'
+
+	def get_queryset(self):
+		for exam in self.request.user.profile.unseen_islamic_studies_exams.all():
+			self.request.user.profile.unseen_islamic_studies_exams.remove(exam)
+
+		return IslamicStudiesExam.objects.filter(student=self.request.user)
 
 
 

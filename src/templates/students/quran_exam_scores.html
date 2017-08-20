@@ -7,7 +7,7 @@
 
 <div class="text-center">
     <h2>
-    Islamic Studies {{user.profile.islamic_studies_class}} Attendance
+    Quran {{user.profile.quran_class}} Exam Results
   </h2>
 </div>
 
@@ -22,34 +22,43 @@
 
 	  <div class="row">
         <div class="col-xs-12">
-          <div class="box box-primary">
-            <div class="box-header">
+
+
+        <div class="box box-primary">
+
+            <div class="box-header text-center">
             </div>
             <!-- /.box-header -->
             <div class="box-body">
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>Week</th>
-                  <th>Date</th>
-                  <th>Attendance</th>            
+                  <th>Exam Number</th>
+                  <th>Exam Score</th>
+                  <th>Posted Date</th>                          
                 </tr>
                 </thead>
                 <tbody>
-                {% for entry in object_list  %}
-                	<tr>
-                		<td>{{entry.week.week_number}}</td>
-                		<td>{{entry.week.date}}</td>
-                	  <td>{{entry.attendance}}</td>                
-                	</tr>
-                	
+
+                {% for result in object_list %}
+                  <tr>
+                    <td>Exam {{result.exam_number}}</td>
+                    <td>{{result.exam_score}}</td>
+                    <td>{{result.posted_date}}</td>
+
+                  </tr>
+                  
                 {% endfor %}
                 
                 </tbody>
               </table>
             </div>
             <!-- /.box-body -->
-          </div>
+        
+        </div>
+
+
+
           <!-- /.box -->
 
         </div>

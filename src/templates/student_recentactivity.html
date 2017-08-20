@@ -33,7 +33,7 @@
                   <!-- timeline time label -->
              
                   <!-- /.timeline-label -->
-                  {% for recent in recent_islamic_studies %}
+      {% for recent in recent_islamic_studies %}
                     
                 {% if recent.title %}
                       
@@ -119,7 +119,7 @@
 
 
                             <div class="timeline-footer">
-                              <a class="btn btn-warning btn-flat btn-xs" href="{% url 'student_detail' username=request.user.username %}">View Score</a>
+                              <a class="btn btn-warning btn-flat btn-xs" href="{% url 'student_islamic_studies_exams'  %}">View Score</a>
                             </div>
                           </div>
                         </li>
@@ -127,7 +127,7 @@
                  {% endif %}
 
 
-              {% endfor %}
+       {% endfor %}
 
               			<li>
                           <i class="fa fa-clock-o bg-gray"></i>
@@ -246,7 +246,7 @@
 
 
                             <div class="timeline-footer">
-                              <a class="btn btn-warning btn-flat btn-xs" href="{% url 'student_detail' username=request.user.username %}">View Score</a>
+                              <a class="btn btn-warning btn-flat btn-xs" href="{% url 'student_quran_exams' %}">View Score</a>
                             </div>
                           </div>
                         </li>

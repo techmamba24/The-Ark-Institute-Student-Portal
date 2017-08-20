@@ -182,7 +182,7 @@
                 <!-- Inner Menu: contains the notifications -->
                 <ul class="menu">
                   <li><!-- start notification -->
-                    <a href="{% url 'student_detail' username=request.user.username %}">
+                    <a href="{% url 'student_quran_exams' %}">
                       <i class="fa fa-book text-yellow"></i> Your Quran teacher posted an exam score for Exam <i>{{exam.exam_number}}</i>
                     </a>
                   </li>
@@ -198,7 +198,7 @@
                 <!-- Inner Menu: contains the notifications -->
                 <ul class="menu">
                   <li><!-- start notification -->
-                    <a href="{% url 'student_detail' username=request.user.username %}">
+                    <a href="{% url 'student_islamic_studies_exams' %}">
                      <i class="fa fa-book text-yellow"></i> Your Islamic Studies teacher posted an exam score for Exam <i>{{exam.exam_number}}</i>
                     </a>
                   </li>
