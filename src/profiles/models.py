@@ -443,7 +443,8 @@ class QuranExam(models.Model):
 		unique_together = ('student','exam_number')
 
 	def get_absolute_url(self):
-		return reverse('student_detail',kwargs={'username':self.student.username})
+		# return reverse('student_detail',kwargs={'username':self.student.username})
+		return reverse('quran_student_list')
 
 	def __str__(self):
 		return self.student.first_name+' '+self.student.last_name+': '+'Exam'+' '+str(self.exam_number)+': '+str(self.exam_score)
@@ -522,7 +523,8 @@ class IslamicStudiesExam(models.Model):
 		unique_together = ('student','exam_number')
 
 	def get_absolute_url(self):
-		return reverse('student_detail',kwargs={'username':self.student.username})
+		# return reverse('student_detail',kwargs={'username':self.student.username})
+		return reverse('islamic_studies_student_list')
 
 	def __str__(self):
 		return self.student.first_name+' '+self.student.last_name+': '+'Exam'+' '+str(self.exam_number)+': '+str(self.exam_score)

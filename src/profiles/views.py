@@ -11,7 +11,7 @@ from itertools import chain
 from operator import attrgetter
 from django.db import IntegrityError
 from django.utils import timezone
-
+from django.contrib import messages
 
 
 User = get_user_model()
@@ -215,11 +215,13 @@ class QuranExamScoreAdd(LoginRequiredMixin, CreateView):
 			self.object.student = context['userobj']
 			self.object.class_level = self.request.user.profile.quran_class
 			self.object.save()
+			messages.success(self.request, f"Successfully posted Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}")
 			self.object.student.profile.unseen_quran_exams.add(self.object)
 
 		except IntegrityError as e:
-				# NEEDS TO BE UPDATED TO A TEMPLATE!!!!
-				return HttpResponse('You already posted an exam score for this exam for this student!')
+				messages.error(self.request, f"You already posted an Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}")
+				return redirect('quran_student_list')
+
 		return super().form_valid(form)
 
 class QuranExamScoreUpdate(LoginRequiredMixin,UpdateView):
@@ -274,11 +276,13 @@ class IslamicStudiesExamScoreAdd(LoginRequiredMixin, CreateView):
 			self.object.student = context['userobj']
 			self.object.class_level = self.request.user.profile.islamic_studies_class
 			self.object.save()
+			messages.success(self.request, f"Successfully posted Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}")
 			context['userobj'].profile.unseen_islamic_studies_exams.add(self.object)
 
 		except IntegrityError as e:
-				# NEEDS TO BE UPDATED TO A TEMPLATE!!!!
-				return HttpResponse('You already posted an exam score for this exam for this student!')
+			messages.error(self.request, f"Error: You already posted an Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}!")
+			return redirect('islamic_studies_student_list')
+		
 		return super().form_valid(form)
 
 class IslamicStudiesExamScoreUpdate(LoginRequiredMixin,UpdateView):
