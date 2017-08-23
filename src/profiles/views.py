@@ -163,7 +163,7 @@ class IslamicStudiesCreatePostView(LoginRequiredMixin, CreateView):
 		self.object.class_level = self.request.user.profile.islamic_studies_class
 		self.object.save()
 		if self.object.author.profile.role == 'Teacher':
-			self.object.teahcerpost_send_email()
+			self.object.teacherpost_send_email()
 		elif self.object.author.profile.role == 'Student':
 			self.object.studentpost_send_email()
 		user_profiles = Profile.objects.filter(islamic_studies_class=self.object.class_level)
@@ -259,7 +259,7 @@ class IslamicStudiesTeacherStudentList(LoginRequiredMixin, ListView):
 	template_name = 'teachers/teacher_islamic_studies_student_list.html'
 
 	def get_queryset(self):
-		return User.objects.filter(profile__islamic_studies_class=self.request.user.profile.quran_class).exclude(profile__role='Teacher')
+		return User.objects.filter(profile__islamic_studies_class=self.request.user.profile.islamic_studies_class).exclude(profile__role='Teacher')
 
 
 class IslamicStudiesExamScoreAdd(LoginRequiredMixin, CreateView):
@@ -335,7 +335,7 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 			quran_average = 0
 			for result in quran_results:
 				quran_average += result.exam_score
-			quran_average = quran_average/len(quran_results)
+			quran_average = round(quran_average/len(quran_results))
 			context['quran_average'] = quran_average
 		
 		islamic_studies_results = userobj.islamic_studies_exam_scores.all()
@@ -343,7 +343,7 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 			islamic_studies_average = 0
 			for result in islamic_studies_results:
 				islamic_studies_average += result.exam_score
-			islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
+			islamic_studies_average = round(islamic_studies_average/len(islamic_studies_results))
 			context['islamic_studies_average'] = islamic_studies_average
 
 		quran_attendance_absent = userobj.quran_attendance.filter(attendance='Absent').count()
@@ -353,7 +353,7 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 
 		if total_quran_attendance > 0:
 
-			quran_attendance_average = ( ( quran_attendance_present + quran_attendance_tardy - (quran_attendance_tardy//2) ) / total_quran_attendance ) * 100
+			quran_attendance_average = round( ( ( quran_attendance_present + quran_attendance_tardy - (quran_attendance_tardy//2) ) / total_quran_attendance ) * 100)
 			print(quran_attendance_average)
 			context['quran_attendance_average'] = quran_attendance_average
 
@@ -364,7 +364,7 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 
 		if total_islamic_studies_attendance > 0:
 
-			islamic_studies_attendance_average = ( ( islamic_studies_attendance_present + islamic_studies_attendance_tardy - (islamic_studies_attendance_tardy//2) ) / total_islamic_studies_attendance ) * 100
+			islamic_studies_attendance_average = round( ( ( islamic_studies_attendance_present + islamic_studies_attendance_tardy - (islamic_studies_attendance_tardy//2) ) / total_islamic_studies_attendance ) * 100 )
 
 			context['islamic_studies_attendance_average'] = islamic_studies_attendance_average
 
@@ -390,7 +390,7 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 					islamic_studies_overall_average+=(0.35*result.exam_score)
 			islamic_studies_overall_average+=(.1*islamic_studies_attendance_average)
 
-			overall_average = (quran_overall_average+islamic_studies_overall_average)/2
+			overall_average = round((quran_overall_average+islamic_studies_overall_average)/2)
 
 			context['overall_average'] = overall_average
 
@@ -443,7 +443,7 @@ class TeacherDetail(LoginRequiredMixin,DetailView):
 				quran_average = 0
 				for result in quran_results:
 					quran_average += result.exam_score
-				quran_average = quran_average/len(quran_results)
+				quran_average = round(quran_average/len(quran_results))
 				context['quran_average'] = quran_average
 
 
@@ -454,9 +454,9 @@ class TeacherDetail(LoginRequiredMixin,DetailView):
 
 			if total_quran_attendance > 0:
 
-				quran_attendance_average = ( quran_attendance_present + quran_attendance_tardy - (quran_attendance_tardy//2) ) / total_quran_attendance
+				quran_attendance_average = round( (( quran_attendance_present + quran_attendance_tardy - (quran_attendance_tardy//2) ) / total_quran_attendance) * 100 )
 
-				context['quran_attendance_average'] = quran_attendance_average*100
+				context['quran_attendance_average'] = quran_attendance_average
 
 			quran_exam1_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class, exam_number=1).order_by('exam_score')
 			quran_exam2_results = QuranExam.objects.filter(class_level=self.request.user.profile.quran_class, exam_number=2).order_by('exam_score')
@@ -478,7 +478,7 @@ class TeacherDetail(LoginRequiredMixin,DetailView):
 				islamic_studies_average = 0
 				for result in islamic_studies_results:
 					islamic_studies_average += result.exam_score
-				islamic_studies_average = islamic_studies_average/len(islamic_studies_results)
+				islamic_studies_average = round(islamic_studies_average/len(islamic_studies_results))
 				context['islamic_studies_average'] = islamic_studies_average
 
 
@@ -490,9 +490,9 @@ class TeacherDetail(LoginRequiredMixin,DetailView):
 
 			if total_islamic_studies_attendance > 0:
 
-				islamic_studies_attendance_average = ( islamic_studies_attendance_present + islamic_studies_attendance_tardy - (islamic_studies_attendance_tardy//2) ) / total_islamic_studies_attendance
+				islamic_studies_attendance_average = round((( islamic_studies_attendance_present + islamic_studies_attendance_tardy - (islamic_studies_attendance_tardy//2) ) / total_islamic_studies_attendance)*100)
 
-				context['islamic_studies_attendance_average'] = islamic_studies_attendance_average*100
+				context['islamic_studies_attendance_average'] = islamic_studies_attendance_average
 
 
 			islamic_studies_exam1_results = IslamicStudiesExam.objects.filter(class_level=self.request.user.profile.islamic_studies_class, exam_number=1).order_by('exam_score')
