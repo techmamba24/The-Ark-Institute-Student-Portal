@@ -13,7 +13,6 @@ class QuranPostForm(forms.ModelForm):
             'message': forms.Textarea(attrs={'class': 'editable medium-editor-textarea postcontent'}),
         }
 
-
 class QuranCommentForm(forms.ModelForm):
 
     class Meta:

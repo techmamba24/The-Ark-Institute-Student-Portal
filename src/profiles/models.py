@@ -245,7 +245,7 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 
 		except BaseException:
 			return reverse('home')
-			
+
 		instance.profile.original_population = True
 		instance.save()
 
@@ -395,7 +395,7 @@ def update_google_sheet_quran_attendance(sender,instance,created,**kwargs):
 		sheet = client.open("Quran Attendance Sample").sheet1
 		 
 		
-		sheet.update_cell(instance.student.pk,instance.week.week_number+7,instance.attendance)
+		sheet.update_cell(instance.student.pk,instance.week.week_number+8,instance.attendance)
 
 
 	except BaseException:
@@ -474,7 +474,7 @@ def update_google_sheet_islamic_studies_attendance(sender,instance,created,**kwa
 		sheet = client.open("Islamic Studies Attendance Sample").sheet1
 		 
 		
-		sheet.update_cell(instance.student.pk,instance.week.week_number+7,instance.attendance)
+		sheet.update_cell(instance.student.pk,instance.week.week_number+8,instance.attendance)
 
 
 	except BaseException:
@@ -670,35 +670,53 @@ class QuranPost(models.Model):
 		return self.title
 		
 
-	# def read_quran_post(self):
-	# 	self.read = True
-	# 	self.save()
+	def teacherpost_send_email(self):
+		recipients = list(User.objects.filter(profile__quran_class=self.class_level,profile__role='Student'))
+		recipient_emails = []
+		for item in recipients:
+			if item.email:
+				recipient_emails.append(item.email)
 
-	# class Meta:
-	# 	unique_together = ['author','message']
+		subject = f"Your Quran Teacher Posted in the Classroom Discussion"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = recipient_emails
+		html_message = f"Dear Student,<br><br>Your Quran teacher has posted in the Classroom Discussion. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
-# @receiver(pre_save, sender=QuranPost, dispatch_uid=code_generator())
-# def add_quran_post_to_unread(sender,instance,*args,**kwargs):
-# 	user_profiles = Profile.objects.filter(quran_class=instance.class_level)
-# 	# instance.save()
-# 	print(len(user_profiles))
-# 	for profile in user_profiles:
-# 		# print(instance.title)
-# 		# print(instance.class_level)
-# 		print(profile.user.username)
+	def studentpost_send_email(self):
+		recipients = list(User.objects.filter(profile__quran_class=self.class_level,profile__role='Teacher'))
+		recipient_emails = []
+		for item in recipients:
+			if item.email:
+				recipient_emails.append(item.email)
 
+		subject = f"{self.author.first_name} {self.author.last_name} Posted in the Classroom Discussion"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = recipient_emails
+		html_message = f"Dear Teacher,<br><br>{self.author.first_name} {self.author.last_name} has posted in the Classroom Discussion of your Quran Class. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 class QuranComment(models.Model):
-    post = models.ForeignKey('profiles.QuranPost', related_name='quran_comments')
-    author = models.ForeignKey(User)
-    comment = models.TextField()
-    posted_date = models.DateTimeField(default=timezone.now)
+	post = models.ForeignKey('profiles.QuranPost', related_name='quran_comments')
+	author = models.ForeignKey(User)
+	comment = models.TextField()
+	posted_date = models.DateTimeField(default=timezone.now)
 
-    def get_absolute_url(self):
-        return reverse("quran_post_detail",kwargs={'pk':self.post.pk})
+	def get_absolute_url(self):
+		return reverse("quran_post_detail",kwargs={'pk':self.post.pk})
 
-    def __str__(self):
-        return self.comment
+	def __str__(self):
+		return self.comment
+
+	def send_email_to_post_author(self):
+		subject = f"{self.author.first_name} Commented On Your Quran Post"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = [self.post.author.email]
+		html_message = f"Dear User,<br><br>{self.author.first_name} {self.author.last_name} has commented on your post in the Quran Classroom Discussion. To view their comment please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 
 class IslamicStudiesPost(models.Model):
@@ -718,19 +736,54 @@ class IslamicStudiesPost(models.Model):
 	class Meta:
 		unique_together = ['author','message']
 
+	def teacherpost_send_email(self):
+		recipients = list(User.objects.filter(profile__islamic_studies_class=self.class_level,profile__role='Student'))
+		recipient_emails = []
+		for item in recipients:
+			if item.email:
+				recipient_emails.append(item.email)
+
+		subject = f"Your Islamic Studies Teacher Posted in the Classroom Discussion"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = recipient_emails
+		html_message = f"Dear Student,<br><br>Your Islamic Studies teacher has posted in the Classroom Discussion. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+
+
+	def studentpost_send_email(self):
+		recipients = list(User.objects.filter(profile__islamic_studies_class=self.class_level,profile__role='Teacher'))
+		recipient_emails = []
+		for item in recipients:
+			if item.email:
+				recipient_emails.append(item.email)
+
+		subject = f"{self.author.first_name} {self.author.last_name} Posted in the Classroom Discussion"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = recipient_emails
+		html_message = f"Dear Teacher,<br><br>{self.author.first_name} {self.author.last_name} has posted in the Classroom Discussion of your Islamic Studies Class. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 class IslamicStudiesComment(models.Model):
-    post = models.ForeignKey('profiles.IslamicStudiesPost', related_name='islamic_studies_comments')
-    author = models.ForeignKey(User)
-    comment = models.TextField()
-    posted_date = models.DateTimeField(default=timezone.now)
+	post = models.ForeignKey('profiles.IslamicStudiesPost', related_name='islamic_studies_comments')
+	author = models.ForeignKey(User)
+	comment = models.TextField()
+	posted_date = models.DateTimeField(default=timezone.now)
 
-    def get_absolute_url(self):
-        return reverse("islamic_studies_post_detail",kwargs={'pk':self.post.pk})
+	def get_absolute_url(self):
+		return reverse("islamic_studies_post_detail",kwargs={'pk':self.post.pk})
 
-    def __str__(self):
-        return self.comment
+	def __str__(self):
+		return self.comment
 
+	def send_email_to_post_author(self):
+		subject = f"{self.author.first_name} Commented On Your Islamic Studies Post"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = [self.post.author.email]
+		html_message = f"Dear User,<br><br>{self.author.first_name} {self.author.last_name} has commented on your post in the Islamic Studies Classroom Discussion. To view their comment please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 
 

@@ -16,8 +16,6 @@ from django.contrib import messages
 
 User = get_user_model()
 
-weekcount = 0
-
 # Create your views here.
 class DashboardView(LoginRequiredMixin, TemplateView):
 	template_name = 'dashboardhome.html'
@@ -98,6 +96,10 @@ class QuranCreatePostView(LoginRequiredMixin, CreateView):
 		self.object.author = self.request.user
 		self.object.class_level = self.request.user.profile.quran_class
 		self.object.save()
+		if self.object.author.profile.role == 'Teacher':
+			self.object.teacherpost_send_email()
+		elif self.object.author.profile.role == 'Student':
+			self.object.studentpost_send_email()
 		user_profiles = Profile.objects.filter(quran_class=self.object.class_level)
 		for profile in user_profiles:
 			if profile.user != self.request.user:
@@ -115,8 +117,9 @@ def add_comment_to_quran_post(request, pk):
 			comment.post = post
 			comment.author = request.user
 			comment.save()
+			comment.send_email_to_post_author()
 			user_profiles = Profile.objects.filter(quran_class=post.class_level)
-			print(len(user_profiles))
+			# print(len(user_profiles))
 			for profile in user_profiles:
 				if profile.user != request.user:
 					profile.unread_quran_comments.add(comment)
@@ -159,6 +162,10 @@ class IslamicStudiesCreatePostView(LoginRequiredMixin, CreateView):
 		self.object.author = self.request.user
 		self.object.class_level = self.request.user.profile.islamic_studies_class
 		self.object.save()
+		if self.object.author.profile.role == 'Teacher':
+			self.object.teahcerpost_send_email()
+		elif self.object.author.profile.role == 'Student':
+			self.object.studentpost_send_email()
 		user_profiles = Profile.objects.filter(islamic_studies_class=self.object.class_level)
 		for profile in user_profiles:
 			if profile.user != self.request.user:
@@ -176,6 +183,7 @@ def add_comment_to_islamic_studies_post(request, pk):
 			comment.post = post
 			comment.author = request.user
 			comment.save()
+			comment.send_email_to_post_author()
 			user_profiles = Profile.objects.filter(islamic_studies_class=post.class_level)
 			for profile in user_profiles:
 				if profile.user != request.user:
