@@ -51,12 +51,28 @@ class QuranExamForm(forms.ModelForm):
         model = QuranExam
         fields = ('exam_number','exam_score')
 
+    def save(self, commit=True):
+        quran_exam =super(QuranExamForm, self).save(commit=False)
+        if commit:
+            quran_exam.save()
+            quran_exam.send_email()
+            
+        return quran_exam
+
 
 class IslamicStudiesExamForm(forms.ModelForm):
 
     class Meta:
         model = IslamicStudiesExam
         fields = ('exam_number','exam_score')
+
+    def save(self, commit=True):
+        islamic_studies_exam =super(IslamicStudiesExamForm, self).save(commit=False)
+        if commit:
+            islamic_studies_exam.save()
+            islamic_studies_exam.send_email()
+            
+        return islamic_studies_exam
 
 class QuranAttendanceForm(forms.ModelForm):
 

@@ -67,28 +67,32 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Content Header (Page header) -->
     <section class="content-header">
       {% block title %}
+
       <div class="container-fluid">
-      <div class="text-center">
-          <h3>
-        {{user.first_name}} {{user.last_name}}'s Profile
-        </h3>
-      </div>
 
-        {% if request.user.profile.role == 'Teacher' %}
-          
-    <div class="pull-right">
-    
-        {% if request.user.profile.quran_class %}
-        <a href="{% url 'qroster' %}" class="btn btn-primary">Quran {{request.user.profile.quran_class}} Student List</a>
-        {% endif %}
+          <div class="text-center">
+              <h3>
+            {{user.first_name}} {{user.last_name}}'s Profile
+            </h3>
+          </div>
 
-        {% if request.user.profile.islamic_studies_class  %}
-         <a href="{% url 'isroster' %}" class="btn btn-primary">Islamic Studies {{request.user.profile.islamic_studies_class}} Student List</a>
-        {% endif %}
+            {% if request.user.profile.role == 'Teacher' %}
+              
+        <div class="pull-right">
+        
+            {% if request.user.profile.quran_class %}
+            <a href="{% url 'qroster' %}" class="btn btn-primary">Quran {{request.user.profile.quran_class}} Student List</a>
+            {% endif %}
+
+            {% if request.user.profile.islamic_studies_class  %}
+             <a href="{% url 'isroster' %}" class="btn btn-primary">Islamic Studies {{request.user.profile.islamic_studies_class}} Student List</a>
+            {% endif %}
+      
+        </div>
+
+            {% endif %}
+
   
-    </div>
-
-        {% endif %}
 
 
 
@@ -149,7 +153,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
          <strong><i class="fa fa-book margin-r-5"></i>Overall Average</strong>
 
                 <p class="text-muted">
-                    {% if overall_average  %}
+                    {% if overall_average %}
                     {{overall_average}}
                       {% else %}
                     Not yet available.
@@ -162,7 +166,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
            <strong><i class="fa fa-book margin-r-5"></i>Quran Exam Average</strong>
 
                 <p class="text-muted">
-                    {% if quran_average  %}
+                    {% if quran_average %}
                     {{quran_average}}
                       {% else %}
                     No results yet.
@@ -174,7 +178,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <strong><i class="fa fa-users margin-r-5"></i>Quran Attendance Average</strong>
 
                <p class="text-muted">
-                    {% if quran_attendance_average  %}
+                    {% if quran_attendance_average %}
                     {{quran_attendance_average}}
                       {% else %}
                     No results yet.
@@ -186,7 +190,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
              <strong><i class="fa fa-book margin-r-5"></i>Islamic Studies Exam Average</strong>
 
              		 <p class="text-muted">
-                        {% if islamic_studies_average  %}
+                        {% if islamic_studies_average %}
                         {{islamic_studies_average}}
                           {% else %}
                         No results yet.
@@ -198,7 +202,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <strong><i class="fa fa-users margin-r-5"></i>Islamic Studies Attendance Average</strong>
 
                <p class="text-muted">
-                    {% if islamic_studies_attendance_average  %}
+                    {% if islamic_studies_attendance_average %}
                     {{islamic_studies_attendance_average}}
                       {% else %}
                     No results yet.
@@ -207,6 +211,37 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
            <hr>
 
+             <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#myModal">Grading Policy</button>
+
+              <!-- Modal -->
+              <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header text-center">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">The Ark Institute Grading Policies</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>How your overall average is calculated:</p>
+                      <ul>
+                        <li>Your attendance average is worth 10% of your grade.</li>
+                        <li>Exam 1 is worth 25% of your grade.</li>
+                        <li>Exam 2 is worth 30% of your grade.</li>
+                        <li>Exam 3 is worth 35% of your grade.</li>
+                      </ul>
+                      <p>An overall score is calculated for both the Quran class and the Islamic Studies class. The two resulting scores are then averaged to produce the overall average. </p>
+                      <br>
+                      <p>Note: Two tardies count as one absence in your attendance average calculation.</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
 
 
             </div>

@@ -8,6 +8,9 @@ from . utils import code_generator
 from arkportal.settings.base import CLIENT_JSON
 from django.core.validators import MaxValueValidator
 from django.db import transaction
+from django.conf import settings
+from django.core.mail import send_mail
+from profiles.utils import code_generator
 
 
 import gspread
@@ -128,6 +131,7 @@ class Profile(models.Model):
 		)
 
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	parent_email = models.EmailField(null=True,blank=True)
 	role = models.CharField(choices=ROLE_CHOICES, max_length=20, null=True, blank=True)
 	quran_class = models.PositiveSmallIntegerField(choices=Q_CHOICES, null=True, blank=True)
 	islamic_studies_class = models.PositiveSmallIntegerField(choices=IS_CHOICES, null=True, blank=True)
@@ -139,7 +143,8 @@ class Profile(models.Model):
 	unseen_islamic_studies_exams = models.ManyToManyField('profiles.IslamicStudiesExam', related_name='unseen_islamic_studies_exams', blank=True)
 	unseen_quran_attendance = models.ManyToManyField('profiles.QuranAttendance', related_name='unseen_quran_attendance', blank=True)
 	unseen_islamic_studies_attendance = models.ManyToManyField('profiles.IslamicStudiesAttendance', related_name='unseen_islamic_studies_attendance', blank=True)
-	populated = models.BooleanField(default=False)
+	original_population = models.BooleanField(default=False)
+	updated_google_sheets = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.user.username
@@ -154,10 +159,101 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 
 	instance.profile.save()
 
+	if instance.profile.role == 'Teacher' and instance.profile.original_population is False and instance.profile.updated_google_sheets is False:
+
+		new_user_pass = instance.last_name+code_generator()
+		instance.set_password(new_user_pass)
+
+		subject = f"Your Ark Institute Student Portal Account Has Been Created"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = [instance.email]
+		html_message = f"Dear Teacher,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, please email studentportal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+			
+		instance.profile.original_population = True
+		instance.profile.updated_google_sheets = True
+		instance.save()
+
+		try:
+			# print('HELLO')
+			# use creds to create a client to interact with the Google Drive API
+			scope = ['https://spreadsheets.google.com/feeds']
+			# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
+			# creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/aamel786/desktop/development/arkportal/src/templates/client_secret.json', scope)
+			creds = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_JSON, scope)
+			client = gspread.authorize(creds)
+			 
+			# Find a workbook by name and open the first sheet
+			# Make sure you use the rit name here.
+			sheet = client.open("Teacher Accounts 2017-2018").sheet1
+
+			sheet.update_cell(instance.pk,1,instance.first_name)
+			sheet.update_cell(instance.pk,2,instance.last_name)
+			sheet.update_cell(instance.pk,3,instance.username)
+			sheet.update_cell(instance.pk,4,new_user_pass)
+
+		except BaseException:
+			return reverse('home')
+
+	elif instance.profile.role == 'Student' and instance.profile.original_population is False:
+
+		weeks = SchoolWeek.objects.all()
+		q_attd = []
+		is_attd = []
+
+		for week in weeks:
+			qattd = QuranAttendance(student=instance,week=week)
+			isattd = IslamicStudiesAttendance(student=instance,week=week)
+			q_attd.append(qattd)
+			is_attd.append(isattd)
+
+		try:
+			with transaction.atomic():
+				QuranAttendance.objects.bulk_create(q_attd)
+				IslamicStudiesAttendance.objects.bulk_create(is_attd)
+		except BaseException:
+			pass
+
+		new_user_pass = instance.last_name+code_generator()
+		instance.set_password(new_user_pass)
+
+		subject = f"Your Ark Institute Student Portal Account Has Been Created"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = [instance.email,instance.profile.parent_email]
+		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, please email studentportal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+
+		try:
+			# print('HELLO')
+			# use creds to create a client to interact with the Google Drive API
+			scope = ['https://spreadsheets.google.com/feeds']
+			# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
+			# creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/aamel786/desktop/development/arkportal/src/templates/client_secret.json', scope)
+			creds = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_JSON, scope)
+			client = gspread.authorize(creds)
+			 
+			# Find a workbook by name and open the first sheet
+			# Make sure you use the rit name here.
+			sheet = client.open("Student Accounts 2017-2018").sheet1
+
+			sheet.update_cell(instance.pk,1,instance.first_name)
+			sheet.update_cell(instance.pk,2,instance.last_name)
+			sheet.update_cell(instance.pk,3,instance.username)
+			sheet.update_cell(instance.pk,4,new_user_pass)
+
+		except BaseException:
+			return reverse('home')
+			
+		instance.profile.original_population = True
+		instance.save()
+
 
 @receiver(post_save,sender=Profile)
 def misc_updates(sender,instance,created,**kwargs):
-	if instance.role == 'Student' and instance.populated is False:
+
+	if instance.role == 'Student' and instance.updated_google_sheets is False:
 		try:
 			# print('HELLO')
 			# use creds to create a client to interact with the Google Drive API
@@ -177,46 +273,34 @@ def misc_updates(sender,instance,created,**kwargs):
 				 
 			first_name = instance.user.first_name
 			last_name = instance.user.last_name
-			sheet.update_cell(instance.pk,1,first_name)
-			sheet.update_cell(instance.pk,2,last_name)
-			sheet.update_cell(instance.pk,3,instance.quran_class)
+			sheet.update_cell(instance.user.pk,1,first_name)
+			sheet.update_cell(instance.user.pk,2,last_name)
+			sheet.update_cell(instance.user.pk,3,instance.quran_class)
 
-			sheet2.update_cell(instance.pk,1,first_name)
-			sheet2.update_cell(instance.pk,2,last_name)
-			sheet2.update_cell(instance.pk,3,instance.islamic_studies_class)
+			sheet2.update_cell(instance.user.pk,1,first_name)
+			sheet2.update_cell(instance.user.pk,2,last_name)
+			sheet2.update_cell(instance.user.pk,3,instance.islamic_studies_class)
 
-			sheet3.update_cell(instance.pk,1,first_name)
-			sheet3.update_cell(instance.pk,2,last_name)
-			sheet3.update_cell(instance.pk,3,instance.quran_class)
+			sheet3.update_cell(instance.user.pk,1,first_name)
+			sheet3.update_cell(instance.user.pk,2,last_name)
+			sheet3.update_cell(instance.user.pk,3,instance.user.email)
+			sheet3.update_cell(instance.user.pk,4,instance.parent_email)
+			sheet3.update_cell(instance.user.pk,5,instance.quran_class)
 
-			sheet4.update_cell(instance.pk,1,first_name)
-			sheet4.update_cell(instance.pk,2,last_name)
-			sheet4.update_cell(instance.pk,3,instance.islamic_studies_class)
+			sheet4.update_cell(instance.user.pk,1,first_name)
+			sheet4.update_cell(instance.user.pk,2,last_name)
+			sheet4.update_cell(instance.user.pk,3,instance.user.email)
+			sheet4.update_cell(instance.user.pk,4,instance.parent_email)
+			sheet4.update_cell(instance.user.pk,5,instance.islamic_studies_class)
+
+			instance.updated_google_sheets = True
+			instance.save()
 			
 		except BaseException:
 			return reverse('home')
 
-		weeks = SchoolWeek.objects.all()
-		q_attd = []
-		is_attd = []
-		for week in weeks:
-			# print('hi')
-			qattd = QuranAttendance(student=instance.user,week=week)
-			isattd = IslamicStudiesAttendance(student=instance.user,week=week)
-			q_attd.append(qattd)
-			is_attd.append(isattd)
-			# QuranAttendance.objects.create(student=instance.user,week=week)
-			# IslamicStudiesAttendance.objects.create(student=instance.user,week=week)
 
-		try:
-			with transaction.atomic():
-				QuranAttendance.objects.bulk_create(q_attd)
-				IslamicStudiesAttendance.objects.bulk_create(is_attd)
-		except BaseException:
-			pass
 
-		instance.populated = True
-		instance.save()
 
 
 class SchoolWeek(models.Model):
@@ -449,6 +533,14 @@ class QuranExam(models.Model):
 	def __str__(self):
 		return self.student.first_name+' '+self.student.last_name+': '+'Exam'+' '+str(self.exam_number)+': '+str(self.exam_score)
 
+	def send_email(self):
+		subject = f"Quran Exam {self.exam_number} Score Posted"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = [self.student.email, self.student.profile.parent_email]
+		html_message = f"Dear {self.student.first_name},<br><br>Your Quran teacher has posted an exam score for Exam {self.exam_number}. To view your score please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+		
 
 @receiver(post_save, sender=QuranExam)
 def update_google_sheet_quran(sender,instance,created,**kwargs):
@@ -528,6 +620,15 @@ class IslamicStudiesExam(models.Model):
 
 	def __str__(self):
 		return self.student.first_name+' '+self.student.last_name+': '+'Exam'+' '+str(self.exam_number)+': '+str(self.exam_score)
+
+
+	def send_email(self):
+		subject = f"Islamic Studies Exam {self.exam_number} Score Posted"
+		from_email = settings.DEFAULT_FROM_EMAIL
+		message = ''
+		recipient_list = [self.student.email,self.student.profile.parent_email]
+		html_message = f"Dear {self.student.first_name},<br><br>Your Islamic Studies teacher has posted an exam score for Exam {self.exam_number}. To view your score please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 @receiver(post_save, sender=IslamicStudiesExam)
 def update_google_sheet_islamic_studies(sender,instance,created,**kwargs):

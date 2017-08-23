@@ -29,6 +29,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'aqil.unia@thearkinstitute.org' 
+EMAIL_HOST_PASSWORD = 'aunia786'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'The Ark Institute Student Portal <aqil.unia@thearkinstitute.org>'
+
+ADMINS = (
+    ('Aamel Unia', 'aamel786@gmail.com'),
+)
+MANAGERS = ADMINS
 
 # Application definition
 

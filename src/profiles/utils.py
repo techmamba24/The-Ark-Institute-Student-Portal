@@ -4,7 +4,7 @@ import string
 from django.conf import settings
 
 
-SHORTCODE_MIN = getattr(settings, "SHORTCODE_MIN", 35)
+SHORTCODE_MIN = getattr(settings, "SHORTCODE_MIN", 5)
 
 #from shortener.models import KirrURL
 
