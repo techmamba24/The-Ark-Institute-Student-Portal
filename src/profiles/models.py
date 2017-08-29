@@ -168,7 +168,7 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [instance.email]
-		html_message = f"Dear Teacher,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, please email studentportal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Teacher,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, please email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 			
 		instance.profile.original_population = True
@@ -203,8 +203,8 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		is_attd = []
 
 		for week in weeks:
-			qattd = QuranAttendance(student=instance,week=week)
-			isattd = IslamicStudiesAttendance(student=instance,week=week)
+			qattd = QuranAttendance(student=instance,week=week,class_level=instance.profile.quran_class)
+			isattd = IslamicStudiesAttendance(student=instance,week=week,class_level=instance.profile.islamic_studies_class)
 			q_attd.append(qattd)
 			is_attd.append(isattd)
 
@@ -222,7 +222,7 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [instance.email,instance.profile.parent_email]
-		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, please email studentportal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 		try:
@@ -318,10 +318,6 @@ class SchoolWeek(models.Model):
 # 	if created:
 # 		users = User.objects.filter(profile__role='Student')
 # 		for user in user:
-
-
-		
-
 
 class QuranAttendance(models.Model):
 

@@ -4,11 +4,15 @@
  <div class="container-fluid">
   <div class="text-center">
       <h2>
-        Islamic Studies
+        Islamic Studies {{object.class_level}} Post
       </h2>
     </div>
       <div class="pull-right">
+      {% if request.user.is_staff %}
+        <a href="{% url 'administrator:islamic_studies_posts_list'%}" class="btn btn-primary">All Classes</a>
+        {% else %}
         <a href="{% url 'islamic_studies_post_list' %}" class="btn btn-primary">All Posts</a>
+      {% endif %}
       </div>
  </div>
 
@@ -35,7 +39,11 @@
 
 </div>
 
-<a href="{% url 'comment_islamic_studies_post' pk=object.pk %}" class="btn btn-danger pull-right">Comment</a>
+{% if not request.user.is_staff  %}
+
+  <a href="{% url 'comment_islamic_studies_post' pk=object.pk %}" class="btn btn-danger pull-right">Comment</a>
+
+{% endif %}
 
 <br>
 <br>

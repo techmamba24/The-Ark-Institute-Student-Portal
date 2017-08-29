@@ -46,7 +46,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <body class="hold-transition skin-red-light sidebar-mini">
 
-{% if request.user.profile.role == 'Teacher' or request.user == user %}
+{% if request.user.profile.role == 'Teacher' or request.user == user or request.user.is_staff %}
   
 
 <div class="wrapper">

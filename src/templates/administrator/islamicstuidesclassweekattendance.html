@@ -1,29 +1,26 @@
 {% extends "dashboardbase.html" %}
 
 {% block title %}
-{% if user.profile.role == 'Teacher' or user.is_staff %}
 
 
 <div class="container-fluid">
 
 <div class="text-center">
     <h2>
-    Quran {{user.profile.quran_class}} Attendance: Week {{week_number}}: {{week_date}}
+    Islamic Studies {{class_level}} Attendance: Week {{week_number}}
   </h2>
 </div>
 
 <div class="pull-right">
-   <a href="{% url 'quran_school_weeks' %}" class="btn btn-primary">Quran Class Attendance</a>
+   <a href="{% url 'administrator:islamic_studies_attendance_list' %}" class="btn btn-primary">All Classes</a>
  </div>
 
 </div>
 
-{% endif %}
 
 {% endblock  %}
 
 {% block maincontent %}
-{% if user.profile.role == 'Teacher' or user.is_staff %}
 	
 
 	  <div class="row">
@@ -39,7 +36,6 @@
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Attendance</th>            
-                  <th>Update Attendance</th> 
                 </tr>
                 </thead>
                 <tbody>
@@ -48,7 +44,6 @@
                 		<td>{{entry.student.first_name}}</td>
                 		<td>{{entry.student.last_name}}</td>
                 	  <td>{{entry.attendance}}</td>                
-                  	<td><a href="{% url 'quran_attendance_update' student=entry.student.username pk=entry.pk %}" class="btn btn-danger">Update</a></td>
                 	</tr>
                 	
                 {% endfor %}
@@ -64,9 +59,6 @@
         <!-- /.col -->
       </div>
       <!-- /.row -->
-{% else %}
 
-<p>Must be a teacher to view this page</p>
 
-{% endif %}
 {% endblock  %}

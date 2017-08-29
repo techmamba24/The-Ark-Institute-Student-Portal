@@ -46,7 +46,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <body class="hold-transition skin-red-light sidebar-mini">
 
-{% if request.user.profile.role == 'Teacher' and request.user == user %}
+{% if request.user == user or request.user.is_staff %}
   
 
 <div class="wrapper">
@@ -59,8 +59,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
   </header>
 
   <!-- SIDEBAR INCLUDES-->
+{% if request.user.is_staff %}
 
-  {% include "mainnav.html" %}
+    {% include "administrator/adminmainnav.html" %}
+
+{% else %}
+  
+    {% include "mainnav.html" %}
+
+{% endif %}
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">

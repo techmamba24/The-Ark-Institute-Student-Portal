@@ -30,11 +30,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'aqil.unia@thearkinstitute.org' 
-EMAIL_HOST_PASSWORD = 'aunia786'
+EMAIL_HOST_USER = 'student.portal@thearkinstitute.org' 
+EMAIL_HOST_PASSWORD = 'arkportal786'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'The Ark Institute Student Portal <aqil.unia@thearkinstitute.org>'
+DEFAULT_FROM_EMAIL = 'The Ark Institute Student Portal <student.portal@thearkinstitute.org>'
 
 ADMINS = (
     ('Aamel Unia', 'aamel786@gmail.com'),
@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'profiles',
-    'bootstrap3'
+    'bootstrap3',
+    'administrator'
 ]
 
 MIDDLEWARE = [

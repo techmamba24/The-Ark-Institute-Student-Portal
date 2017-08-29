@@ -3,7 +3,7 @@
 {% block title %}
 <div class="text-center">
     <h2>
-    Quran {{user.profile.quran_class}}
+    Islamic Studies {{class_level}} Attendance
   </h2>
 </div>
 
@@ -15,7 +15,7 @@
           <div class="box box-danger">
             <div class="box-header">
                 {% for teacher in teachers  %}
-                  <b>Teacher:</b> {{teacher.first_name}} {{teacher.last_name}} ({{teacher.email}})<br>
+                  <b class="box-title">Teacher:</b> {{teacher.first_name}} {{teacher.last_name}}: {{teacher.email}}<br>
                 {% endfor %}
             </div>
             <!-- /.box-header -->
@@ -23,24 +23,18 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email Adress</th>            
-                  <th>Islamic Studies Class</th>   
-                  <th>Student Profile</th>
+                  <th>Week</th>
+                  <th>Date</th>
+                  <th>Student Attendance</th>            
                 </tr>
                 </thead>
                 <tbody>
 
-                {% for user in object_list  %}
+                {% for week in object_list  %}
                   <tr>
-                    <td>{{user.first_name}}</td>
-                    <td>{{user.last_name}}</td>
-                      <td>{{user.email}}</td>                
-                      <td>{{user.profile.islamic_studies_class}}</td>
-                      {% if request.user.profile.role == 'Teacher' or request.user.is_staff %}        
-                        <td><a href="{% url 'student_detail' username=user.username %}" class="btn btn-primary">View</a></td>
-                      {% endif %}
+                    <td>{{week.week_number}}</td>
+                    <td>{{week.date}}</td>
+                    <td><a href="{% url 'administrator:islamic_studies_week_attendance' level=class_level week=week.week_number %}" class="btn btn-primary">View</a></td>
                   </tr>
                   
                 {% endfor %}
