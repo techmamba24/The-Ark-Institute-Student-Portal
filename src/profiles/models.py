@@ -17,58 +17,6 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 
-# class StudentRegistration(models.Model):
-# 	user = models.ForeignKey(User,related_name='registration')
-# 	registration_form = models.FileField()
-	# user = models.OnetoOneField(User)
-	# student_first_name = models.CharField(max_length=30)
-	# student_last_name = models.CharField(max_length=30)
-	# Male = 'Male'
-	# Female = 'Female'
-	# GENDER_CHOICES = (
-	# 		(Male, 'Male'),
-	# 		(Female, 'Female'),
-	# 	)
-	# student_gender = models.CharField(choices=GENDER_CHOICES)
-	# student_birth_date = models.DateField()
-	# student_email = models.EmailField(null=True,blank=True)
-	# student_phone = models.CharField(max_length=10)
-
-	# Yes = 'Yes'
-	# No = 'No'
-	# LIVING_CHOICES = (
-	# 		(Yes, 'Yes'),
-	# 		(No, 'No'),
-	# 	)
-
-	# father_first_name = models.CharField(max_length=30)
-	# father_last_name = models.CharField(max_length=30)
-	# father_phone = models.CharField(max_length=10)
-	# father_email = models.EmailField()
-	# father_street_adress = models.TextField()
-	# father_city = models.TextField()
-	# father_state = models.TextField()
-	# father_zip_code = models.CharField(max_length=5)
-	# father_lives_with_student = models.CharField(choices=LIVING_CHOICES)
-
-	# mother_first_name = models.CharField(max_length=30)
-	# mother_last_name = models.CharField(max_length=30)
-	# mother_phone = models.CharField(max_length=10)
-	# mother_email = models.EmailField()
-	# mother_street_adress = models.TextField(null=True,blank=True)
-	# mother_city = models.TextField(null=True,blank=True)
-	# mother_state = models.TextField(null=True,blank=True)
-	# mother_zip_code = models.CharField(max_length=5, null=True,blank=True)
-	# mother_lives_with_student = models.CharField(choices=LIVING_CHOICES)
-
-	# physical_disabilites = models.CharField(choices=LIVING_CHOICES,defualt=No)
-	# allergies = models.CharField(choices=LIVING_CHOICES,defualt=No)
-	# serious_illness = models.CharField(choices=LIVING_CHOICES,defualt=No)
-	# please_explain = models.TextField(null=True,blank=True)
-
-
-
-
 # Create your models here.
 class Profile(models.Model):
 
@@ -117,6 +65,7 @@ class Profile(models.Model):
 	IS7 = 7
 	IS8 = 8
 	IS9 = 9
+	IS10 = 10
 
 	IS_CHOICES = (
 			(IS1, 'IS1'),
@@ -128,6 +77,8 @@ class Profile(models.Model):
 			(IS7, 'IS7'),
 			(IS8, 'IS8'),
 			(IS9, 'IS9'),
+			(IS10, 'IS10'),
+
 		)
 
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -143,6 +94,7 @@ class Profile(models.Model):
 	unseen_islamic_studies_exams = models.ManyToManyField('profiles.IslamicStudiesExam', related_name='unseen_islamic_studies_exams', blank=True)
 	unseen_quran_attendance = models.ManyToManyField('profiles.QuranAttendance', related_name='unseen_quran_attendance', blank=True)
 	unseen_islamic_studies_attendance = models.ManyToManyField('profiles.IslamicStudiesAttendance', related_name='unseen_islamic_studies_attendance', blank=True)
+	activation_email_sent = models.BooleanField(default=False)
 	original_population = models.BooleanField(default=False)
 	updated_google_sheets = models.BooleanField(default=False)
 
@@ -156,24 +108,24 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 
 	if created:
 		Profile.objects.create(user=instance)
+		
 
-	instance.profile.save()
+	new_teacher_pass = instance.last_name+code_generator()
 
-	if instance.profile.role == 'Teacher' and instance.profile.original_population is False and instance.profile.updated_google_sheets is False:
+	if instance.profile.role == 'Teacher' and instance.profile.activation_email_sent is False:
 
-		new_user_pass = instance.last_name+code_generator()
-		instance.set_password(new_user_pass)
+		instance.set_password(new_teacher_pass)
 
 		subject = f"Your Ark Institute Student Portal Account Has Been Created"
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [instance.email]
-		html_message = f"Dear Teacher,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, please email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Teacher,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_teacher_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 			
-		instance.profile.original_population = True
-		instance.profile.updated_google_sheets = True
-		instance.save()
+		instance.profile.activation_email_sent = True
+
+	if instance.profile.role == 'Teacher' and instance.profile.updated_google_sheets is False:
 
 		try:
 			# print('HELLO')
@@ -191,12 +143,22 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 			sheet.update_cell(instance.pk,1,instance.first_name)
 			sheet.update_cell(instance.pk,2,instance.last_name)
 			sheet.update_cell(instance.pk,3,instance.username)
-			sheet.update_cell(instance.pk,4,new_user_pass)
+			sheet.update_cell(instance.pk,4,new_teacher_pass)
+			sheet.update_cell(instance.pk,5,instance.profile.quran_class)
+			sheet.update_cell(instance.pk,6,instance.profile.islamic_studies_class)
 
-		except BaseException:
+		except BaseException as e:
+			# print(e)
 			return reverse('home')
 
-	elif instance.profile.role == 'Student' and instance.profile.original_population is False:
+		instance.profile.updated_google_sheets = True
+		instance.profile.original_population = True
+
+
+
+	new_student_pass = instance.last_name+code_generator()
+
+	if instance.profile.role == 'Student' and instance.profile.original_population is False:
 
 		weeks = SchoolWeek.objects.all()
 		q_attd = []
@@ -215,15 +177,23 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		except BaseException:
 			pass
 
-		new_user_pass = instance.last_name+code_generator()
-		instance.set_password(new_user_pass)
+		instance.profile.original_population = True
+
+
+	if instance.profile.role == 'Student' and instance.profile.activation_email_sent is False:
+
+		instance.set_password(new_student_pass)
 
 		subject = f"Your Ark Institute Student Portal Account Has Been Created"
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [instance.email,instance.profile.parent_email]
-		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_user_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_student_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
+		
+		instance.profile.activation_email_sent = True
+
+	if instance.profile.role == 'Student' and instance.profile.updated_google_sheets is False:
 
 		try:
 			# print('HELLO')
@@ -241,13 +211,14 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 			sheet.update_cell(instance.pk,1,instance.first_name)
 			sheet.update_cell(instance.pk,2,instance.last_name)
 			sheet.update_cell(instance.pk,3,instance.username)
-			sheet.update_cell(instance.pk,4,new_user_pass)
+			sheet.update_cell(instance.pk,4,new_student_pass)
 
 		except BaseException:
 			return reverse('home')
 
-		instance.profile.original_population = True
-		instance.save()
+		instance.profile.updated_google_sheets = True
+
+	instance.profile.save()
 
 
 @receiver(post_save,sender=Profile)
@@ -266,7 +237,7 @@ def misc_updates(sender,instance,created,**kwargs):
 			# Find a workbook by name and open the first sheet
 			# Make sure you use the rit name here.
 			sheet = client.open("Quran Exam Scores Sample").sheet1
-			sheet2 = client.open("IS Exam Scores Sample").sheet1
+			sheet2 = client.open("Islamic Studies Exam Scores").sheet1
 			sheet3 = client.open("Quran Attendance Sample").sheet1
 			sheet4 = client.open("Islamic Studies Attendance Sample").sheet1
 
@@ -412,6 +383,7 @@ class IslamicStudiesAttendance(models.Model):
 	IS7 = 7
 	IS8 = 8
 	IS9 = 9
+	IS10 = 10
 
 	IS_CHOICES = (
 			(IS1, 'IS1'),
@@ -423,6 +395,8 @@ class IslamicStudiesAttendance(models.Model):
 			(IS7, 'IS7'),
 			(IS8, 'IS8'),
 			(IS9, 'IS9'),
+			(IS10, 'IS10'),
+
 		)
 
 	class_level = models.PositiveSmallIntegerField(choices=IS_CHOICES,null=True,blank=True)
@@ -587,6 +561,7 @@ class IslamicStudiesExam(models.Model):
 	IS7 = 7
 	IS8 = 8
 	IS9 = 9
+	IS10 = 10
 
 	IS_CHOICES = (
 			(IS1, 'IS1'),
@@ -598,6 +573,7 @@ class IslamicStudiesExam(models.Model):
 			(IS7, 'IS7'),
 			(IS8, 'IS8'),
 			(IS9, 'IS9'),
+			(IS10, 'IS10'),
 		)
 
 	exam_number = models.PositiveSmallIntegerField(choices=Exam_choices)
@@ -638,7 +614,7 @@ def update_google_sheet_islamic_studies(sender,instance,created,**kwargs):
 		 
 		# Find a workbook by name and open the first sheet
 		# Make sure you use the rit name here.
-		sheet = client.open("IS Exam Scores Sample").sheet1
+		sheet = client.open("Islamic Studies Exam Scores").sheet1
 
 		exam_score = instance.exam_score
 		if instance.exam_number == 1:
