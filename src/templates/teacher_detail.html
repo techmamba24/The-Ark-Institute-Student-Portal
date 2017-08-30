@@ -12,20 +12,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <title>The Ark Institute Student Portal</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="stylesheet" href="{% static "bower_components/bootstrap/dist/css/bootstrap.min.css" %}">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="{% static "bower_components/font-awesome/css/font-awesome.min.css" %}">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">  
+
+<!-- Font Awesome -->
+
+<script src="https://use.fontawesome.com/d2f68dc124.js"></script>
+
   <!-- Ionicons -->
-  <link rel="stylesheet" href="{% static "bower_components/Ionicons/css/ionicons.min.css" %}">
 
    {# MEDIUM STYLE EDITOR#}
 <script src="//cdn.jsdelivr.net/medium-editor/latest/js/medium-editor.min.js"></script>
 <link rel="stylesheet" href="//cdn.jsdelivr.net/medium-editor/latest/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
 
   <!-- Theme style -->
-  <link rel="stylesheet" href="{% static "dist/css/AdminLTE.min.css" %}">
+  <link rel="stylesheet" href="{% static "AdminLTE.min.copy.css" %}">
 
-  <link rel="stylesheet" href="{% static "dist/css/skins/skin-red-light.min.css" %}">
+  <link rel="stylesheet" href="{% static "skin-red-light.min.copy.css" %}">
 
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -513,12 +516,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <!-- REQUIRED JS SCRIPTS -->
 
-<!-- jQuery 3 -->
-<script src="{% static "bower_components/jquery/dist/jquery.min.js" %}"></script>
-<!-- Bootstrap 3.3.7 -->
-<script src="{% static "bower_components/bootstrap/dist/js/bootstrap.min.js" %}"></script>
+<script
+  src="https://code.jquery.com/jquery-3.0.0.min.js"
+  integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="
+  crossorigin="anonymous"></script>
+
+  <!-- Bootstrap 3.3.7 -->
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 <!-- AdminLTE App -->
-<script src="{% static "dist/js/adminlte.min.js" %}"></script>
+<script src="{% static "adminlte.min.copy.js" %}"></script>
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the

@@ -1,5 +1,7 @@
 arkportal/settings/local.py
 arkportal/settings/local2.py
+arkportal/settings/base.py
+
 
 db.sqlite3
 

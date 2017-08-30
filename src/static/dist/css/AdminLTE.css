@@ -187,7 +187,7 @@ a:focus {
  */
 .main-header {
   position: relative;
-  max-height: 200px;
+  max-height: 100px;
   z-index: 1030;
 }
 .main-header .navbar {
@@ -204,7 +204,7 @@ a:focus {
   margin-left: 0;
 }
 .main-header #navbar-search-input.form-control {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.2);
   border-color: transparent;
 }
 .main-header #navbar-search-input.form-control:focus,

@@ -107,9 +107,10 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 
 	if created:
 		Profile.objects.create(user=instance)
-		
 
-	new_teacher_pass = instance.last_name+code_generator()
+	# instance.profile.save()	
+	random_token = code_generator()
+	new_teacher_pass = instance.last_name+random_token
 
 	if instance.profile.role == 'Teacher' and instance.profile.activation_email_sent is False:
 
@@ -123,8 +124,6 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 			
 		instance.profile.activation_email_sent = True
-
-	if instance.profile.role == 'Teacher' and instance.profile.updated_google_sheets is False:
 
 		try:
 			# print('HELLO')
@@ -143,6 +142,29 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 			sheet.update_cell(instance.pk,2,instance.last_name)
 			sheet.update_cell(instance.pk,3,instance.username)
 			sheet.update_cell(instance.pk,4,new_teacher_pass)
+
+
+		except BaseException as e:
+			return reverse('home')
+
+		instance.save()
+
+	if instance.profile.role == 'Teacher' and instance.profile.updated_google_sheets is False:
+
+		try:
+			# print('HELLO')
+			# use creds to create a client to interact with the Google Drive API
+			scope = ['https://spreadsheets.google.com/feeds']
+			# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
+			# creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/aamel786/desktop/development/arkportal/src/templates/client_secret.json', scope)
+			creds = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_JSON, scope)
+			client = gspread.authorize(creds)
+			 
+			# Find a workbook by name and open the first sheet
+			# Make sure you use the rit name here.
+			sheet = client.open("Teacher Accounts 2017-2018").sheet1
+
+
 			sheet.update_cell(instance.pk,5,instance.profile.quran_class)
 			sheet.update_cell(instance.pk,6,instance.profile.islamic_studies_class)
 
@@ -153,9 +175,6 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		instance.profile.updated_google_sheets = True
 		instance.profile.original_population = True
 
-
-
-	new_student_pass = instance.last_name+code_generator()
 
 	if instance.profile.role == 'Student' and instance.profile.original_population is False:
 
@@ -178,6 +197,9 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 
 		instance.profile.original_population = True
 
+	random_token = code_generator()
+	
+	new_student_pass = instance.last_name+random_token
 
 	if instance.profile.role == 'Student' and instance.profile.activation_email_sent is False:
 
@@ -191,8 +213,8 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 		
 		instance.profile.activation_email_sent = True
-
-	if instance.profile.role == 'Student' and instance.profile.updated_google_sheets is False:
+		
+		instance.save()
 
 		try:
 			# print('HELLO')
@@ -215,8 +237,8 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		except BaseException:
 			return reverse('home')
 
-		instance.profile.updated_google_sheets = True
 
+	# instance.save()
 	instance.profile.save()
 
 
