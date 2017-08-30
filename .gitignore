@@ -1,0 +1,5 @@
+src/arkportal/settings/base.py
+src/arkportal/settings/local.py
+src/arkportal/settings/production.py
+src/templates/client_secret.json
+src/db.sqlite3

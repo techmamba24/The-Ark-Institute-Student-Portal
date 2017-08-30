@@ -34,24 +34,23 @@ class Profile(models.Model):
 
 	Q1 = 1
 	Q2 = 2
-	Q3 = 3
 	Q4 = 4
-	Q5 = 5
 	Q6 = 6
 	Q7 = 7
 	Q8 = 8
 	Q9 = 9
+	Q10 = 10
 
 	Q_CHOICES = (
 			(Q1, 'Q1'),
 			(Q2, 'Q2'),
-			(Q3, 'Q3'),
 			(Q4, 'Q4'),
-			(Q5, 'Q5'),
 			(Q6, 'Q6'),
 			(Q7, 'Q7'),
 			(Q8, 'Q8'),
 			(Q9, 'Q9'),
+			(Q10, 'Q10'),
+
 		)
 
 	# Islamic Studies class options.
@@ -296,24 +295,23 @@ class QuranAttendance(models.Model):
 
 	Q1 = 1
 	Q2 = 2
-	Q3 = 3
 	Q4 = 4
-	Q5 = 5
 	Q6 = 6
 	Q7 = 7
 	Q8 = 8
 	Q9 = 9
+	Q10 = 10
 
 	Q_CHOICES = (
 			(Q1, 'Q1'),
 			(Q2, 'Q2'),
-			(Q3, 'Q3'),
 			(Q4, 'Q4'),
-			(Q5, 'Q5'),
 			(Q6, 'Q6'),
 			(Q7, 'Q7'),
 			(Q8, 'Q8'),
 			(Q9, 'Q9'),
+			(Q10, 'Q10'),
+
 		)
 
 	class_level = models.PositiveSmallIntegerField(choices=Q_CHOICES,null=True,blank=True)
@@ -466,24 +464,22 @@ class QuranExam(models.Model):
 
 	Q1 = 1
 	Q2 = 2
-	Q3 = 3
 	Q4 = 4
-	Q5 = 5
 	Q6 = 6
 	Q7 = 7
 	Q8 = 8
 	Q9 = 9
+	Q10 = 10
 
 	Q_CHOICES = (
 			(Q1, 'Q1'),
 			(Q2, 'Q2'),
-			(Q3, 'Q3'),
 			(Q4, 'Q4'),
-			(Q5, 'Q5'),
 			(Q6, 'Q6'),
 			(Q7, 'Q7'),
 			(Q8, 'Q8'),
 			(Q9, 'Q9'),
+			(Q10, 'Q10')
 		)
 
 	exam_number = models.PositiveSmallIntegerField(choices=Exam_choices)

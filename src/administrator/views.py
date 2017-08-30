@@ -15,7 +15,7 @@ from django.contrib import messages
 
 User = get_user_model()
 
-quran_classes = [1,3,4,6,7,8,9,10]
+quran_classes = [1,2,4,6,7,8,9,10]
 
 islamic_studies_classes = [1,2,3,4,5,6,7,8,9,10]
 
