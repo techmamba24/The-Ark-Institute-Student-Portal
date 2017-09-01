@@ -63,9 +63,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   </header>
 
-  <!-- SIDEBAR INCLUDES-->
+ <!-- SIDEBAR INCLUDES-->
+  {% if request.user.is_staff %}
+
+  {% include "administrator/adminmainnav.html" %}
+
+  {% else %}
 
   {% include "mainnav.html" %}
+
+
+  {% endif %}
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">

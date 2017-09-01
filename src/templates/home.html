@@ -23,7 +23,6 @@
 
   
   
-  
 </head>
 <body>
 
@@ -79,7 +78,31 @@
                     <a class="btn btn-lg btn-primary" href="{% url 'logout' %}">Log Out</a> 
                     {% else %}
                     <a class="btn btn-lg btn-primary" href="{% url 'login' %}">Login</a> 
-                    <a class="btn btn-lg btn-primary" href="">Request Account</a>   
+                    <!--
+                   <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#myModal">Grading Policy</button> -->
+                    <a class="btn btn-lg btn-primary" href="" data-toggle="modal" data-target="#myModal">Request Account</a> 
+                          <!-- Modal -->
+                          <div id="myModal" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+
+                              <!-- Modal content-->
+                              <div class="modal-content">
+                                <div class="modal-header text-center">
+                                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                  <h4 class="modal-title">Request an Account</h4>
+                                </div>
+                                <div class="modal-body">
+                                  <p> <b>Students:</b> Once you submit a registration form with payment, an account will be created for you within 2-3 days of your submission and you should recieve an email with your login credentials. If an account still has not been created for you, please email student.portal@thearkinstitute.org and an account will be created for you.</p>
+                                  <br><br>
+                                 <p> <b>Teachers:</b> You should have recieved an email at your Ark Institute email address with your login credentials. If an account still has not been created for you, please email student.portal@thearkinstitute.org or contact the administration staff so an account can be created for you.</p>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>  
 
                     {% endif %}
 
@@ -93,7 +116,7 @@
 
 </section>
 
-<footer class="mbr-small-footer mbr-section mbr-section-nopadding" id="footer1-2" style="background-color: rgb(184, 49, 47); padding-top: 0.875rem; padding-bottom: 0.875rem;">
+<footer class="mbr-small-footer mbr-section mbr-section-nopadding" id="footer1-2" style="background-color: #e25041; padding-top: 0.875rem; padding-bottom: 0.875rem;">
     
     <div class="container">
         <p class="text-xs-center" style="color:white;">Copyright (c) 2017 The Ark Institute</p>

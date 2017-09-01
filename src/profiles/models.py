@@ -120,7 +120,7 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [instance.email]
-		html_message = f"Dear Teacher,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_teacher_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Teacher,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_teacher_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you. You can login <a href='https://arkportal.herokuapp.com'>here</a>.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 			
 		instance.profile.activation_email_sent = True
@@ -209,7 +209,7 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [instance.email,instance.profile.parent_email]
-		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_student_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_student_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you. You can login <a href='https://arkportal.herokuapp.com'>here</a>.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 		
 		instance.profile.activation_email_sent = True
@@ -526,7 +526,7 @@ class QuranExam(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [self.student.email, self.student.profile.parent_email]
-		html_message = f"Dear {self.student.first_name},<br><br>Your Quran teacher has posted an exam score for Exam {self.exam_number}. To view your score please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear {self.student.first_name},<br><br>Your Quran teacher has posted an exam score for Exam {self.exam_number}. To view your score please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 		
 
@@ -617,7 +617,7 @@ class IslamicStudiesExam(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [self.student.email,self.student.profile.parent_email]
-		html_message = f"Dear {self.student.first_name},<br><br>Your Islamic Studies teacher has posted an exam score for Exam {self.exam_number}. To view your score please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear {self.student.first_name},<br><br>Your Islamic Studies teacher has posted an exam score for Exam {self.exam_number}. To view your score please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 @receiver(post_save, sender=IslamicStudiesExam)
@@ -671,7 +671,7 @@ class QuranPost(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = recipient_emails
-		html_message = f"Dear Student,<br><br>Your Quran teacher has posted in the Classroom Discussion. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Student,<br><br>Your Quran teacher has posted in the Classroom Discussion. To view their post please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 	def studentpost_send_email(self):
@@ -685,7 +685,7 @@ class QuranPost(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = recipient_emails
-		html_message = f"Dear Teacher,<br><br>{self.author.first_name} {self.author.last_name} has posted in the Classroom Discussion of your Quran Class. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Teacher,<br><br>{self.author.first_name} {self.author.last_name} has posted in the Classroom Discussion of your Quran Class. To view their post please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 class QuranComment(models.Model):
@@ -705,7 +705,7 @@ class QuranComment(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [self.post.author.email]
-		html_message = f"Dear User,<br><br>{self.author.first_name} {self.author.last_name} has commented on your post in the Quran Classroom Discussion. To view their comment please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear User,<br><br>{self.author.first_name} {self.author.last_name} has commented on your post in the Quran Classroom Discussion. To view their comment please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 
@@ -737,7 +737,7 @@ class IslamicStudiesPost(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = recipient_emails
-		html_message = f"Dear Student,<br><br>Your Islamic Studies teacher has posted in the Classroom Discussion. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Student,<br><br>Your Islamic Studies teacher has posted in the Classroom Discussion. To view their post please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 
@@ -752,7 +752,7 @@ class IslamicStudiesPost(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = recipient_emails
-		html_message = f"Dear Teacher,<br><br>{self.author.first_name} {self.author.last_name} has posted in the Classroom Discussion of your Islamic Studies Class. To view their post please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear Teacher,<br><br>{self.author.first_name} {self.author.last_name} has posted in the Classroom Discussion of your Islamic Studies Class. To view their post please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 class IslamicStudiesComment(models.Model):
@@ -772,7 +772,7 @@ class IslamicStudiesComment(models.Model):
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
 		recipient_list = [self.post.author.email]
-		html_message = f"Dear User,<br><br>{self.author.first_name} {self.author.last_name} has commented on your post in the Islamic Studies Classroom Discussion. To view their comment please login to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		html_message = f"Dear User,<br><br>{self.author.first_name} {self.author.last_name} has commented on your post in the Islamic Studies Classroom Discussion. To view their comment please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 
