@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.models import User
 from profiles.models import QuranPost, QuranComment, IslamicStudiesPost,IslamicStudiesComment, Profile, QuranExam, IslamicStudiesExam, SchoolWeek, QuranAttendance, IslamicStudiesAttendance
+from profiles.forms import QuranPostForm, QuranCommentForm, IslamicStudiesPostForm, IslamicStudiesCommentForm, QuranExamForm, IslamicStudiesExamForm, QuranAttendanceForm, IslamicStudiesAttendanceForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -11,6 +12,8 @@ from operator import attrgetter
 from django.db import IntegrityError
 from django.utils import timezone
 from django.contrib import messages
+# from django.core.urlresolvers import reverse
+
 
 
 User = get_user_model()
@@ -171,6 +174,42 @@ class QuranClassExamScores(LoginRequiredMixin, PermissionRequiredMixin, ListView
 	def has_permission(self):
 		return self.request.user.is_staff
 
+class QuranExamScoreAdd(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+
+	model = QuranExam
+	form_class = QuranExamForm
+	template_name = 'administrator/quran_exam_score_add.html'
+	success_url = '/administrator/quran-class-exams/'
+
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(QuranExamScoreAdd,self).get_context_data(*args,**kwargs)
+		student = self.kwargs['student']
+		userobj = User.objects.filter(username__iexact=student).first()
+		context['full_name'] = userobj.first_name+' '+userobj.last_name
+		context['userobj'] = userobj
+		return context
+
+	def form_valid(self,form):
+		try:
+			self.object = form.save(commit=False)
+			context = self.get_context_data()
+			self.object.student = context['userobj']
+			self.object.class_level = self.kwargs['level']
+			self.object.save()
+			messages.success(self.request, f"Successfully posted Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}")
+			context['userobj'].profile.unseen_quran_exams.add(self.object)
+
+		except IntegrityError as e:
+			messages.error(self.request, f"Error: You already posted an Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}!")
+			return redirect('administrator:quran_classes_exams')
+		
+		return super().form_valid(form)
+
+
+	def has_permission(self):
+		return self.request.user.is_staff
+
 
 class IslamicStudiesClassesExamList(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
 	template_name = 'administrator/islamicstudiesclassesexamlist.html'
@@ -197,6 +236,44 @@ class IslamicStudiesClassExamScores(LoginRequiredMixin, PermissionRequiredMixin,
 		class_level = self.kwargs.get('level')
 		context['class_level'] = class_level
 		return context
+
+	def has_permission(self):
+		return self.request.user.is_staff
+
+
+class IslamicStudiesExamScoreAdd(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+
+	model = IslamicStudiesExam
+	form_class = IslamicStudiesExamForm
+	template_name = 'administrator/islamic_studies_exam_score_add.html'
+	# success_url = reverse("administrator:islamic_studies_classes_exams")
+	success_url = '/administrator/islamic-studies-class-exams/'
+
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(IslamicStudiesExamScoreAdd,self).get_context_data(*args,**kwargs)
+		student = self.kwargs['student']
+		userobj = User.objects.filter(username__iexact=student).first()
+		context['full_name'] = userobj.first_name+' '+userobj.last_name
+		context['userobj'] = userobj
+		return context
+
+	def form_valid(self,form):
+		try:
+			self.object = form.save(commit=False)
+			context = self.get_context_data()
+			self.object.student = context['userobj']
+			self.object.class_level = self.kwargs['level']
+			self.object.save()
+			messages.success(self.request, f"Successfully posted Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}")
+			context['userobj'].profile.unseen_islamic_studies_exams.add(self.object)
+
+		except IntegrityError as e:
+			messages.error(self.request, f"Error: You already posted an Exam {self.object.exam_number} score for {self.object.student.first_name} {self.object.student.last_name}!")
+			return redirect('administrator:islamic_studies_classes_exams')
+		
+		return super().form_valid(form)
+
 
 	def has_permission(self):
 		return self.request.user.is_staff
@@ -295,4 +372,5 @@ class IslamicStudiesClassWeekAttendance(LoginRequiredMixin,PermissionRequiredMix
 
 	def has_permission(self):
 		return self.request.user.is_staff
+
 

@@ -22,6 +22,7 @@
                 <tr>
                   <th>First Name</th>
                   <th>Last Name</th>
+                  <th>Post Score</th>
                   <th>Exam 1</th>            
                   <th>Exam 2</th>   
                   <th>Exam 3</th>
@@ -33,6 +34,7 @@
                   <tr>
                     <td>{{user.first_name}}</td>
                     <td>{{user.last_name}}</td>
+                    <td> <a href="{% url 'administrator:quran_exam_score_add' level=class_level student=user.username %}" class="btn btn-danger">Click Here</a> </td>
                     {% for exam in user.quran_exam_scores.all %}
                       <td>{{exam.exam_score}}</td>
                     {% endfor %}

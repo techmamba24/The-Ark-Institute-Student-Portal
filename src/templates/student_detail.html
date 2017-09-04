@@ -140,12 +140,56 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <p class="text-muted text-center">{{user.profile.role}}</p>
 
               <ul class="list-group list-group-unbordered">
+
                 <li class="list-group-item">
                   <b>Quran Level</b> <a class="pull-right">{{user.profile.quran_class}}</a>
                 </li>
                 <li class="list-group-item">
                   <b>Islamic Studies Level</b> <a class="pull-right">{{user.profile.islamic_studies_class}}</a>
                 </li>
+
+              {% if user.email %}
+              <li class="list-group-item">
+              <b>Student Email</b> <a class="pull-right">{{user.email}}</a>
+              </li>
+              {% endif %}
+
+              {% if user.profile.student_phone_number %}
+              <li class="list-group-item">
+              <b>Student Number</b> <a class="pull-right">{{user.profile.student_phone_number}}</a>
+              </li>
+              {% endif %}
+
+              {% if user.profile.father_email %}
+              <li class="list-group-item">
+              <b>Father's Email</b> <a class="pull-right">{{user.profile.father_email}}</a>
+              </li>
+              {% endif %}
+
+              {% if user.profile.father_phone_number %}
+              <li class="list-group-item">
+              <b>Father's Number</b> <a class="pull-right">{{user.profile.father_phone_number}}</a>
+              </li>
+              {% endif %}
+
+              {% if user.profile.mother_email %}
+              <li class="list-group-item">
+              <b>Mother's Email</b> <a class="pull-right">{{user.profile.mother_email}}</a>
+              </li>
+              {% endif %}
+
+              {% if user.profile.mother_phone_number %}
+              <li class="list-group-item">
+              <b>Mother's Number</b> <a class="pull-right">{{user.profile.mother_phone_number}}</a>
+              </li>
+              {% endif %}
+
+              {% if user.profile.address %}
+              <li class="list-group-item">
+              <b>Address</b> <a class="pull-right">{{user.profile.address}}</a>
+              </li>
+              {% endif %}
+
               </ul>
 
             </div>

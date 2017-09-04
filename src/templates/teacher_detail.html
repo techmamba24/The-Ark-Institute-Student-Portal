@@ -80,7 +80,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <div class="container-fluid">
       <div class="text-center">
           <h3>
-        {{user.first_name}} {{user.last_name}}'s Profile
+         {% if user.profile.gender == 'Male' %}Br.{% endif %}{% if user.profile.gender == 'Female' %}Sr.{% endif %}{{user.first_name}} {{user.last_name}}'s Profile
         </h3>
       </div>
 

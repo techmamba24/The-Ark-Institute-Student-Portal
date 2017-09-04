@@ -80,9 +80,22 @@ class Profile(models.Model):
 
 		)
 
+	GENDER_CHOICES = (
+		('Male', 'Male'),
+		('Female', 'Female'),
+	)
+
+	#testing
+	
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	parent_email = models.EmailField(null=True,blank=True)
+	father_email = models.EmailField(null=True,blank=True)
+	father_phone_number = models.CharField(max_length=10,null=True,blank=True)
+	mother_email = models.EmailField(null=True,blank=True)
+	mother_phone_number = models.CharField(max_length=10,null=True,blank=True)
+	address = models.TextField(null=True,blank=True)
+	student_phone_number = models.CharField(max_length=10,null=True,blank=True)
 	role = models.CharField(choices=ROLE_CHOICES, max_length=20, null=True, blank=True)
+	gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True)
 	quran_class = models.PositiveSmallIntegerField(choices=Q_CHOICES, null=True, blank=True)
 	islamic_studies_class = models.PositiveSmallIntegerField(choices=IS_CHOICES, null=True, blank=True)
 	unread_quran_posts = models.ManyToManyField('profiles.QuranPost', related_name='unread_quran_posts', blank=True)
@@ -208,8 +221,8 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 		subject = f"Your Ark Institute Student Portal Account Has Been Created"
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
-		recipient_list = [instance.email,instance.profile.parent_email]
-		html_message = f"Dear Student and Parent,<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_student_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you. You can login <a href='https://arkportal.herokuapp.com'>here</a>.<br><br> Thank You,<br><br>The Ark Institute."
+		recipient_list = [instance.email,instance.profile.father_email,instance.profile.mother_email]
+		html_message = f"Dear Student and Parent(s),<br><br>Your Ark Institute Student Portal account has been created. Here are your login credentials:<br><br>Username: {instance.username}<br>Password: {new_student_pass}<br><br>If you have trouble logging in, email student.portal@thearkinstitute.org so we can resolve the issue for you. You can login <a href='https://arkportal.herokuapp.com'>here</a>.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 		
 		instance.profile.activation_email_sent = True
@@ -247,7 +260,6 @@ def misc_updates(sender,instance,created,**kwargs):
 
 	if instance.role == 'Student' and instance.updated_google_sheets is False:
 		try:
-			# print('HELLO')
 			# use creds to create a client to interact with the Google Drive API
 			scope = ['https://spreadsheets.google.com/feeds']
 			# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
@@ -261,6 +273,7 @@ def misc_updates(sender,instance,created,**kwargs):
 			sheet2 = client.open("Islamic Studies Exam Scores").sheet1
 			sheet3 = client.open("Quran Attendance Sample").sheet1
 			sheet4 = client.open("Islamic Studies Attendance Sample").sheet1
+			sheet5 = client.open("Student Accounts 2017-2018").sheet1
 
 				 
 			first_name = instance.user.first_name
@@ -275,24 +288,27 @@ def misc_updates(sender,instance,created,**kwargs):
 
 			sheet3.update_cell(instance.user.pk,1,first_name)
 			sheet3.update_cell(instance.user.pk,2,last_name)
-			sheet3.update_cell(instance.user.pk,3,instance.user.email)
-			sheet3.update_cell(instance.user.pk,4,instance.parent_email)
-			sheet3.update_cell(instance.user.pk,5,instance.quran_class)
+			sheet3.update_cell(instance.user.pk,3,instance.quran_class)
 
 			sheet4.update_cell(instance.user.pk,1,first_name)
 			sheet4.update_cell(instance.user.pk,2,last_name)
-			sheet4.update_cell(instance.user.pk,3,instance.user.email)
-			sheet4.update_cell(instance.user.pk,4,instance.parent_email)
-			sheet4.update_cell(instance.user.pk,5,instance.islamic_studies_class)
+			sheet4.update_cell(instance.user.pk,3,instance.islamic_studies_class)
 
+			sheet5.update_cell(instance.pk,5,instance.father_email)
+			sheet5.update_cell(instance.pk,6,instance.father_phone_number)
+			sheet5.update_cell(instance.pk,7,instance.mother_email)
+			sheet5.update_cell(instance.pk,8,instance.mother_phone_number)
+			sheet5.update_cell(instance.pk,9,instance.address)
+			sheet5.update_cell(instance.pk,10,instance.student_phone_number)
+			sheet5.update_cell(instance.pk,11,instance.user.email)
+			sheet5.update_cell(instance.pk,12,instance.quran_class)
+			sheet5.update_cell(instance.pk,13,instance.islamic_studies_class)
+		
 			instance.updated_google_sheets = True
 			instance.save()
 			
 		except BaseException:
 			return reverse('home')
-
-
-
 
 
 class SchoolWeek(models.Model):
@@ -305,11 +321,6 @@ class SchoolWeek(models.Model):
 	class Meta:
 		unique_together = ('week_number','date')
 
-# @receiver(post_save, sender=SchoolWeek)
-# def create_user_attendances(sender,instance,created,**kwargs):
-# 	if created:
-# 		users = User.objects.filter(profile__role='Student')
-# 		for user in user:
 
 class QuranAttendance(models.Model):
 
@@ -375,15 +386,12 @@ def update_google_sheet_quran_attendance(sender,instance,created,**kwargs):
 		# json_data = os.path.join(BASE_DIR, 'static', "client_secret.json") NEED TO FIND HOW TO PROPERLY LINK JSON FILE
 		# creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/aamel786/desktop/development/arkportal/src/templates/client_secret.json', scope)
 		creds = ServiceAccountCredentials.from_json_keyfile_name(CLIENT_JSON, scope)
-		client = gspread.authorize(creds)
-		 
+		client = gspread.authorize(creds) 
 		# Find a workbook by name and open the first sheet
-		# Make sure you use the rit name here.
+		# Make sure you use the right name here.
 		sheet = client.open("Quran Attendance Sample").sheet1
 		 
-		
-		sheet.update_cell(instance.student.pk,instance.week.week_number+8,instance.attendance)
-
+		sheet.update_cell(instance.student.pk,instance.week.week_number+6,instance.attendance)
 
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})
@@ -463,13 +471,10 @@ def update_google_sheet_islamic_studies_attendance(sender,instance,created,**kwa
 		# Make sure you use the rit name here.
 		sheet = client.open("Islamic Studies Attendance Sample").sheet1
 		 
-		
-		sheet.update_cell(instance.student.pk,instance.week.week_number+8,instance.attendance)
-
+		sheet.update_cell(instance.student.pk,instance.week.week_number+6,instance.attendance)
 
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})
-
 
 
 class QuranExam(models.Model):
@@ -509,7 +514,6 @@ class QuranExam(models.Model):
 	student = models.ForeignKey(User, limit_choices_to={'profile__role':'Student'} ,related_name='quran_exam_scores')
 	class_level = models.PositiveIntegerField(choices=Q_CHOICES,null=True,blank=True)
 	posted_date = models.DateTimeField(default=timezone.now)
-	# date_taken = models.DateTimeField()
 
 	class Meta:
 		unique_together = ('student','exam_number')
@@ -525,8 +529,8 @@ class QuranExam(models.Model):
 		subject = f"Quran Exam {self.exam_number} Score Posted"
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
-		recipient_list = [self.student.email, self.student.profile.parent_email]
-		html_message = f"Dear {self.student.first_name},<br><br>Your Quran teacher has posted an exam score for Exam {self.exam_number}. To view your score please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		recipient_list = [self.student.email, self.student.profile.father_email,self.student.profile.mother_email]
+		html_message = f"Dear Student and Parent(s),<br><br>{self.student.first_name}'s Quran teacher has posted an exam score for Exam {self.exam_number}. To view your score please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 		
 
@@ -555,8 +559,6 @@ def update_google_sheet_quran(sender,instance,created,**kwargs):
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})
 
-
-	# print(list_of_hashes)
 
 class IslamicStudiesExam(models.Model):
 
@@ -616,8 +618,8 @@ class IslamicStudiesExam(models.Model):
 		subject = f"Islamic Studies Exam {self.exam_number} Score Posted"
 		from_email = settings.DEFAULT_FROM_EMAIL
 		message = ''
-		recipient_list = [self.student.email,self.student.profile.parent_email]
-		html_message = f"Dear {self.student.first_name},<br><br>Your Islamic Studies teacher has posted an exam score for Exam {self.exam_number}. To view your score please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
+		recipient_list = [self.student.email,self.student.profile.father_email,self.student.profile.mother_email]
+		html_message = f"Dear Student and Parent(s),<br><br>{self.student.first_name}'s Islamic Studies teacher has posted an exam score for Exam {self.exam_number}. To view your score please <a href='https://arkportal.herokuapp.com'>login</a> to your Student Portal account.<br><br> Thank You,<br><br>The Ark Institute."
 		send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=html_message)
 
 @receiver(post_save, sender=IslamicStudiesExam)
@@ -631,7 +633,7 @@ def update_google_sheet_islamic_studies(sender,instance,created,**kwargs):
 		client = gspread.authorize(creds)
 		 
 		# Find a workbook by name and open the first sheet
-		# Make sure you use the rit name here.
+		# Make sure you use the right name here.
 		sheet = client.open("Islamic Studies Exam Scores").sheet1
 
 		exam_score = instance.exam_score
@@ -659,7 +661,6 @@ class QuranPost(models.Model):
 	def __str__(self):
 		return self.title
 		
-
 	def teacherpost_send_email(self):
 		recipients = list(User.objects.filter(profile__quran_class=self.class_level,profile__role='Student'))
 		recipient_emails = []

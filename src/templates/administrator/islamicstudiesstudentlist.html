@@ -31,14 +31,14 @@
                 </thead>
                 <tbody>
                 {% for teacher in teachers  %}
-
+                  <tr>
                     <td>{{teacher.first_name}}</td>
                     <td>{{teacher.last_name}}</td>
                     <td>{{teacher.email}}</td>                
                     <td>{{teacher.profile.islamic_studies_class}}</td>
                     <td><a href="{% url 'teacher_detail' username=teacher.username %}" class="btn btn-primary">View</a></td>
                     <td><b>{{teacher.profile.role}}</b></td>
-
+                  </tr>
                 {% endfor %}
 
                 {% for user in object_list  %}

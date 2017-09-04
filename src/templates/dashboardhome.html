@@ -76,7 +76,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       {% block title %}
       <div class="text-center">
           <h3>
-        {{request.user.first_name}}'s Dashboard
+        {% if request.user.profile.gender == 'Male' %}Br.{% endif %}{% if request.user.profile.gender == 'Female' %}Sr.{% endif %}{{request.user.first_name}}'s Dashboard
         </h3>
       </div>
       
