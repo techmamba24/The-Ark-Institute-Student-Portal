@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic.base import TemplateView
-from administrator.views import QuranRosterClasses, QuranRosterClassList, IslamicStudiesRosterClasses, IslamicStudiesRosterClassList, QuranPostsList,IslamicStudiesPostsList,QuranClassPostListView,IslamicStudiesClassPostListView,QuranClassExamScores,QuranClassesExamList,IslamicStudiesClassExamScores, IslamicStudiesClassesExamList, QuranClassWeekAttendance, QuranClassesAttendanceList, QuranClassWeeksList, IslamicStudiesClassWeekAttendance, IslamicStudiesClassesAttendanceList, IslamicStudiesClassWeeksList, IslamicStudiesExamScoreAdd, QuranExamScoreAdd
+from administrator.views import QuranRosterClasses, QuranRosterClassList, IslamicStudiesRosterClasses, IslamicStudiesRosterClassList, QuranPostsList,IslamicStudiesPostsList,QuranClassPostListView,IslamicStudiesClassPostListView,QuranClassExamScores,QuranClassesExamList,IslamicStudiesClassExamScores, IslamicStudiesClassesExamList, QuranClassWeekAttendance, QuranClassWeekAttendanceUpdate, QuranClassesAttendanceList, QuranClassWeeksList, IslamicStudiesClassWeekAttendance, IslamicStudiesClassWeekAttendanceUpdate, IslamicStudiesClassesAttendanceList, IslamicStudiesClassWeeksList, IslamicStudiesExamScoreAdd, QuranExamScoreAdd
 
 urlpatterns = [
     url(r'^quran-class-rosters/$', QuranRosterClasses.as_view(),name='qrosters'),
@@ -36,9 +36,12 @@ urlpatterns = [
     url(r'^quran-class-attendance/$', QuranClassesAttendanceList.as_view(),name='quran_attendance_list'),
     url(r'^quran-class-attendance/(?P<level>([1-9]|10))/$', QuranClassWeeksList.as_view(),name='quran_weeks_list'),
     url(r'^quran-class-attendance/(?P<level>([1-9]|10))/(?P<week>\d+)/$', QuranClassWeekAttendance.as_view(),name='quran_week_attendance'),
+    url(r'^quran-class-attendance/(?P<level>([1-9]|10))/(?P<week>\d+)/(?P<student>[\w\.-]+)/(?P<pk>\d+)/$', QuranClassWeekAttendanceUpdate.as_view(),name='quran_week_attendance_update'),
     url(r'^islamic-studies-class-attendance/$', IslamicStudiesClassesAttendanceList.as_view(),name='islamic_studies_attendance_list'),
     url(r'^islamic-studies-class-attendance/(?P<level>([1-9]|10))/$', IslamicStudiesClassWeeksList.as_view(),name='islamic_studies_weeks_list'),
     url(r'^islamic-studies-class-attendance/(?P<level>([1-9]|10))/(?P<week>\d+)/$', IslamicStudiesClassWeekAttendance.as_view(),name='islamic_studies_week_attendance'),
+    url(r'^islamic-studies-class-attendance/(?P<level>([1-9]|10))/(?P<week>\d+)/(?P<student>[\w\.-]+)/(?P<pk>\d+)/$', IslamicStudiesClassWeekAttendanceUpdate.as_view(),name='islamic_studies_week_attendance_update'),
+
 
 
 

@@ -125,6 +125,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <section class="content container-fluid">
 
       <div class="row">
+
         <div class="col-md-4">
 
           <!-- Profile Image -->
@@ -148,48 +149,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <b>Islamic Studies Level</b> <a class="pull-right">{{user.profile.islamic_studies_class}}</a>
                 </li>
 
-              {% if user.email %}
-              <li class="list-group-item">
-              <b>Student Email</b> <a class="pull-right">{{user.email}}</a>
-              </li>
-              {% endif %}
-
-              {% if user.profile.student_phone_number %}
-              <li class="list-group-item">
-              <b>Student Number</b> <a class="pull-right">{{user.profile.student_phone_number}}</a>
-              </li>
-              {% endif %}
-
-              {% if user.profile.father_email %}
-              <li class="list-group-item">
-              <b>Father's Email</b> <a class="pull-right">{{user.profile.father_email}}</a>
-              </li>
-              {% endif %}
-
-              {% if user.profile.father_phone_number %}
-              <li class="list-group-item">
-              <b>Father's Number</b> <a class="pull-right">{{user.profile.father_phone_number}}</a>
-              </li>
-              {% endif %}
-
-              {% if user.profile.mother_email %}
-              <li class="list-group-item">
-              <b>Mother's Email</b> <a class="pull-right">{{user.profile.mother_email}}</a>
-              </li>
-              {% endif %}
-
-              {% if user.profile.mother_phone_number %}
-              <li class="list-group-item">
-              <b>Mother's Number</b> <a class="pull-right">{{user.profile.mother_phone_number}}</a>
-              </li>
-              {% endif %}
-
-              {% if user.profile.address %}
-              <li class="list-group-item">
-              <b>Address</b> <a class="pull-right">{{user.profile.address}}</a>
-              </li>
-              {% endif %}
-
               </ul>
 
             </div>
@@ -197,7 +156,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>
           <!-- /.box -->
 
-          <!-- About Me Box -->
+
+
           <div class="box box-danger">
             <div class="box-header with-border text-center">
               <h3 class="box-title">Student Performance</h3>
@@ -305,6 +265,64 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <!-- /.box-body -->
           </div>
           <!-- /.box -->
+
+
+
+          <div class="box box-danger">
+            <div class="box-header with-border text-center">
+              <h3 class="box-title">Student Information</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+
+            <ul class="list-group list-group-unbordered">
+
+              {% if user.email %}
+              <li class="list-group-item">
+              <b>Student Email: </b> {{user.email}}
+              </li>
+              {% endif %}
+
+              {% if user.profile.student_phone_number %}
+              <li class="list-group-item">
+              <b>Student Number: </b> {{user.profile.student_phone_number}}
+              </li>
+              {% endif %}
+
+              {% if user.profile.father_email %}
+              <li class="list-group-item">
+              <b>Father's Email: </b> {{user.profile.father_email}}
+              </li>
+              {% endif %}
+
+              {% if user.profile.father_phone_number %}
+              <li class="list-group-item">
+              <b>Father's Number: </b> {{user.profile.father_phone_number}}
+              </li>
+              {% endif %}
+
+              {% if user.profile.mother_email %}
+              <li class="list-group-item">
+              <b>Mother's Email: </b> {{user.profile.mother_email}}
+              </li>
+              {% endif %}
+
+              {% if user.profile.mother_phone_number %}
+              <li class="list-group-item">
+              <b>Mother's Number: </b> {{user.profile.mother_phone_number}}
+              </li>
+              {% endif %}
+
+              {% if user.profile.address %}
+              <li class="list-group-item">
+              <b>Address: </b> {{user.profile.address}}
+              </li>
+              {% endif %}
+
+        </ul>
+            </div>
+            <!-- /.box-body -->
+          </div>
 
       </div>
 

@@ -27,6 +27,18 @@
                 <li class="list-group-item">
                   <b>Islamic Studies Level</b> <a class="pull-right">{{request.user.profile.islamic_studies_class}}</a>
                 </li>
+                {% if quran_book %}
+                <li class="list-group-item" style="padding-bottom: 20px;">
+                <b>Quran Syllabus</b> <a href="{{quran_book}}" target="_blank" class="pull-right btn btn-primary">View</a>
+                <br>
+                </li>
+               {% endif %}
+                {% if islamic_studies_book %}
+                <li class="list-group-item" style="padding-bottom: 20px;">
+                <b>Islamic Studies Syllabus</b> <a href="{{islamic_studies_book}}" target="_blank" class="pull-right btn btn-primary">View</a>
+                <br>
+                </li>
+               {% endif %}
               </ul>
 
               <a href="{% url 'logout' %}" class="btn btn-danger btn-block"><b>Sign Out</b></a>

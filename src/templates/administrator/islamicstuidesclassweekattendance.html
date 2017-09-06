@@ -35,7 +35,8 @@
                 <tr>
                   <th>First Name</th>
                   <th>Last Name</th>
-                  <th>Attendance</th>            
+                  <th>Attendance</th>  
+                  <th>Update</th>          
                 </tr>
                 </thead>
                 <tbody>
@@ -43,7 +44,8 @@
                 	<tr>
                 		<td>{{entry.student.first_name}}</td>
                 		<td>{{entry.student.last_name}}</td>
-                	  <td>{{entry.attendance}}</td>                
+                	  <td>{{entry.attendance}}</td>   
+                    <td><a href="{% url 'administrator:islamic_studies_week_attendance_update' level=class_level week=week_number student=entry.student.username pk=entry.pk %}" class="btn btn-danger">Click Here</a></td>               
                 	</tr>
                 	
                 {% endfor %}

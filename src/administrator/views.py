@@ -12,7 +12,7 @@ from operator import attrgetter
 from django.db import IntegrityError
 from django.utils import timezone
 from django.contrib import messages
-# from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 
 
 
@@ -179,7 +179,7 @@ class QuranExamScoreAdd(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
 	model = QuranExam
 	form_class = QuranExamForm
 	template_name = 'administrator/quran_exam_score_add.html'
-	success_url = '/administrator/quran-class-exams/'
+	# success_url = '/administrator/quran-class-exams/'
 
 
 	def get_context_data(self,*args,**kwargs):
@@ -206,6 +206,9 @@ class QuranExamScoreAdd(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
 		
 		return super().form_valid(form)
 
+
+	def get_success_url(self):
+		return reverse_lazy('administrator:quran_class_exam_scores',kwargs={'level':self.kwargs['level']})
 
 	def has_permission(self):
 		return self.request.user.is_staff
@@ -247,7 +250,7 @@ class IslamicStudiesExamScoreAdd(LoginRequiredMixin, PermissionRequiredMixin, Cr
 	form_class = IslamicStudiesExamForm
 	template_name = 'administrator/islamic_studies_exam_score_add.html'
 	# success_url = reverse("administrator:islamic_studies_classes_exams")
-	success_url = '/administrator/islamic-studies-class-exams/'
+	# success_url = '/administrator/islamic-studies-class-exams/'
 
 
 	def get_context_data(self,*args,**kwargs):
@@ -274,6 +277,9 @@ class IslamicStudiesExamScoreAdd(LoginRequiredMixin, PermissionRequiredMixin, Cr
 		
 		return super().form_valid(form)
 
+
+	def get_success_url(self):
+		return reverse_lazy('administrator:quran_class_exam_scores',kwargs={'level':self.kwargs['level']})
 
 	def has_permission(self):
 		return self.request.user.is_staff
@@ -326,6 +332,43 @@ class QuranClassWeekAttendance(LoginRequiredMixin,PermissionRequiredMixin,ListVi
 	def has_permission(self):
 		return self.request.user.is_staff
 
+class QuranClassWeekAttendanceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+
+	model = QuranAttendance
+	template_name = 'administrator/quran_attendance_update.html'
+	form_class = QuranAttendanceForm
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(QuranClassWeekAttendanceUpdate,self).get_context_data(*args,**kwargs)
+		student = self.kwargs['student']
+		userobj = User.objects.filter(username__iexact=student).first()
+		attd_id = self.kwargs['pk']
+		week = QuranAttendance.objects.filter(pk=attd_id).first().week
+		context['week_number'] = week.week_number
+		context['week_date'] = week.date
+		context['full_name'] = userobj.first_name+' '+userobj.last_name
+		context['userobj'] = userobj
+		class_level = self.kwargs.get('level')
+		week_number = self.kwargs.get('week')
+		context['class_level'] = class_level
+		context['week_number'] = week_number
+		return context
+
+	def form_valid(self,form):
+		context = self.get_context_data()
+		self.object = form.save(commit=False)
+		self.object.class_level = context['userobj'].profile.quran_class
+		self.object.save()
+		context['userobj'].profile.unseen_quran_attendance.add(self.object)
+		return super().form_valid(form)
+
+	def get_success_url(self):
+		return reverse_lazy('administrator:quran_week_attendance', kwargs={'level':self.kwargs.get('level'), 'week':self.kwargs.get('week')})
+
+	def has_permission(self):
+		return self.request.user.is_staff
+
+
 class IslamicStudiesClassesAttendanceList(LoginRequiredMixin,PermissionRequiredMixin,TemplateView):
 
 	template_name = 'administrator/islamicstudiesclassesattendancelist.html'
@@ -372,5 +415,42 @@ class IslamicStudiesClassWeekAttendance(LoginRequiredMixin,PermissionRequiredMix
 
 	def has_permission(self):
 		return self.request.user.is_staff
+
+class IslamicStudiesClassWeekAttendanceUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+
+	model = IslamicStudiesAttendance
+	template_name = 'administrator/islamic_studies_attendance_update.html'
+	form_class = IslamicStudiesAttendanceForm
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(IslamicStudiesClassWeekAttendanceUpdate,self).get_context_data(*args,**kwargs)
+		student = self.kwargs['student']
+		userobj = User.objects.filter(username__iexact=student).first()
+		attd_id = self.kwargs['pk']
+		week = IslamicStudiesAttendance.objects.filter(pk=attd_id).first().week
+		context['week_number'] = week.week_number
+		context['week_date'] = week.date
+		context['full_name'] = userobj.first_name+' '+userobj.last_name
+		context['userobj'] = userobj
+		class_level = self.kwargs.get('level')
+		week_number = self.kwargs.get('week')
+		context['class_level'] = class_level
+		context['week_number'] = week_number
+		return context
+
+	def form_valid(self,form):
+		context = self.get_context_data()
+		self.object = form.save(commit=False)
+		self.object.class_level = context['userobj'].profile.islamic_studies_class
+		self.object.save()
+		context['userobj'].profile.unseen_islamic_studies_attendance.add(self.object)
+		return super().form_valid(form)
+
+	def get_success_url(self):
+		return reverse_lazy('administrator:islamic_studies_week_attendance', kwargs={'level':self.kwargs.get('level'), 'week':self.kwargs.get('week')})
+
+	def has_permission(self):
+		return self.request.user.is_staff
+
 
 

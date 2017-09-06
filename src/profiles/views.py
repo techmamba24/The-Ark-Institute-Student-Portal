@@ -16,6 +16,26 @@ from django.contrib import messages
 
 User = get_user_model()
 
+islamic_studies_books = {1:'https://drive.google.com/file/d/0B-AWw0mDOl6ET3lBbHZkR2V2dVU/view?usp=sharing',
+						 2:'https://drive.google.com/file/d/0B-AWw0mDOl6ENzNITUsxNXlpLVU/view?usp=sharing',
+						 3:'https://drive.google.com/file/d/0B-AWw0mDOl6ENENwdVo5NlpDS2s/view?usp=sharing',
+						 4:'https://drive.google.com/file/d/0B-AWw0mDOl6EaTFyQkNKNHB1c1k/view?usp=sharing',
+						 5:'https://drive.google.com/file/d/0B-AWw0mDOl6EV3RoMlJDaWZ0TXc/view?usp=sharing',
+						 6:'https://drive.google.com/file/d/0B-AWw0mDOl6ERks1MEIwdUl5bXM/view?usp=sharing',
+						 7:'https://drive.google.com/file/d/0B-AWw0mDOl6Ea0ZLb2NlQ29RaEU/view?usp=sharing',
+						 8:'https://drive.google.com/file/d/0B-AWw0mDOl6Ed00zWDl0UXo5TlE/view?usp=sharing',
+						 9:'https://drive.google.com/file/d/0B-AWw0mDOl6EZmh0aGFzZHI3QzQ/view?usp=sharing'}
+
+
+
+quran_books =  {1:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/view?usp=sharing',
+			    2:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/view?usp=sharing',
+				4:'https://drive.google.com/file/d/0B-AWw0mDOl6ES0xQaGZIU0ZWRTg/view?usp=sharing',
+				6:'https://drive.google.com/file/d/0B-AWw0mDOl6ET2xqdjA0WlRaVEk/view?usp=sharing',
+				7:'https://drive.google.com/file/d/0B-AWw0mDOl6EazZvTVM1UEtIbGs/view?usp=sharing',
+				8:'https://drive.google.com/file/d/0B-AWw0mDOl6EZmttbVROdEowNFk/view?usp=sharing',
+				9:'https://drive.google.com/file/d/0B-AWw0mDOl6EMnZJcUlUSWFiNE0/view?usp=sharing'}
+
 # Create your views here.
 class DashboardView(LoginRequiredMixin, TemplateView):
 	template_name = 'dashboardhome.html'
@@ -36,6 +56,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 			recent_islamic_studies_activity = sorted(chain(recent_islamic_studies_posts, recent_islamic_studies_comments, recent_islamic_studies_exams), key=attrgetter('posted_date'))
 			context['recent_quran'] = list(reversed(recent_quran_activity[-10:]))
 			context['recent_islamic_studies'] = list(reversed(recent_islamic_studies_activity[-10:]))
+			context['islamic_studies_books'] = islamic_studies_books
+			context['quran_books'] = quran_books
 
 		else:
 
@@ -49,7 +71,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 			recent_islamic_studies_activity = sorted(chain(recent_islamic_studies_posts, recent_islamic_studies_comments, recent_islamic_studies_exams), key=attrgetter('posted_date'))
 			context['recent_quran'] = list(reversed(recent_quran_activity[-3:]))
 			context['recent_islamic_studies'] = list(reversed(recent_islamic_studies_activity[-3:]))
-
+			if self.request.user.profile.islamic_studies_class and self.request.user.profile.islamic_studies_class<10:
+				context['islamic_studies_book'] = islamic_studies_books[self.request.user.profile.islamic_studies_class]
+			if self.request.user.profile.quran_class and self.request.user.profile.quran_class<10:
+				context['quran_book'] = quran_books[self.request.user.profile.quran_class]
+				
 		return context
 
 
