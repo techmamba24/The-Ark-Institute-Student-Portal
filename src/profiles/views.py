@@ -24,9 +24,18 @@ islamic_studies_books = {1:'https://drive.google.com/file/d/0B-AWw0mDOl6ET3lBbHZ
 						 6:'https://drive.google.com/file/d/0B-AWw0mDOl6ERks1MEIwdUl5bXM/view?usp=sharing',
 						 7:'https://drive.google.com/file/d/0B-AWw0mDOl6Ea0ZLb2NlQ29RaEU/view?usp=sharing',
 						 8:'https://drive.google.com/file/d/0B-AWw0mDOl6Ed00zWDl0UXo5TlE/view?usp=sharing',
-						 9:'https://drive.google.com/file/d/0B-AWw0mDOl6EZmh0aGFzZHI3QzQ/view?usp=sharing'}
+						 9:'https://drive.google.com/file/d/0B-AWw0mDOl6EZmh0aGFzZHI3QzQ/view?usp=sharing',
+						 10:'https://drive.google.com/file/d/0B3OqTaId2fAReFVpRDBGQ1AwRkk/view?usp=sharing'}
 
-
+islamic_studies_outlines = {1:'https://drive.google.com/file/d/0B-AWw0mDOl6ER0R4d3ZGUkhXLXc/view?usp=sharing',
+						 2:'https://drive.google.com/file/d/0B-AWw0mDOl6ETjh6UHh0V0xqRHc/view?usp=sharing',
+						 3:'https://drive.google.com/file/d/0B-AWw0mDOl6EU2J0TWNseDhJX2s/view?usp=sharing',
+						 4:'https://drive.google.com/file/d/0B-AWw0mDOl6ETmxlVjlOeHY1UUk/view?usp=sharing',
+						 5:'https://drive.google.com/file/d/0B-AWw0mDOl6EVU9ZTTJ3YUlmNGM/view?usp=sharing',
+						 6:'https://drive.google.com/file/d/0B-AWw0mDOl6ETGZNdXRUMHgzSXM/view?usp=sharing',
+						 7:'https://drive.google.com/file/d/0B-AWw0mDOl6EeG9ncTNIb1VmcTQ/view?usp=sharing',
+						 8:'https://drive.google.com/file/d/0B-AWw0mDOl6Eb191OXp5MldOSkk/view?usp=sharing',
+						 9:'https://drive.google.com/file/d/0B3OqTaId2fARYThTdWs1ZG80VjA/view?usp=sharing'}
 
 quran_books =  {1:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/view?usp=sharing',
 			    2:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/view?usp=sharing',
@@ -35,6 +44,15 @@ quran_books =  {1:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/
 				7:'https://drive.google.com/file/d/0B-AWw0mDOl6EazZvTVM1UEtIbGs/view?usp=sharing',
 				8:'https://drive.google.com/file/d/0B-AWw0mDOl6EZmttbVROdEowNFk/view?usp=sharing',
 				9:'https://drive.google.com/file/d/0B-AWw0mDOl6EMnZJcUlUSWFiNE0/view?usp=sharing'}
+
+quran_outlines = {1:'https://drive.google.com/file/d/0B-AWw0mDOl6ESGtRTnh2Sk9uWjA/view?usp=sharing',
+			    2:'https://drive.google.com/file/d/0B-AWw0mDOl6EN3hZbG5PWS04UmM/view?usp=sharing',
+				4:'https://drive.google.com/file/d/0B-AWw0mDOl6ENlJDS3ZteGRiQ3c/view?usp=sharing',
+				6:'https://drive.google.com/file/d/0B-AWw0mDOl6ERUE3TWRwNkZnUmM/view?usp=sharing',
+				7:'https://drive.google.com/file/d/0B-AWw0mDOl6EMzNBS2NBekZQOVU/view?usp=sharing',
+				8:'https://drive.google.com/file/d/0B-AWw0mDOl6EWl91U1BFZDlsQm8/view?usp=sharing',
+				9:'https://drive.google.com/file/d/0B-AWw0mDOl6ENjFDWlRqNGgyUkU/view?usp=sharing'}
+
 
 # Create your views here.
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -58,6 +76,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 			context['recent_islamic_studies'] = list(reversed(recent_islamic_studies_activity[-10:]))
 			context['islamic_studies_books'] = islamic_studies_books
 			context['quran_books'] = quran_books
+			context['islamic_studies_outlines'] = islamic_studies_outlines
+			context['quran_outlines'] = quran_outlines
 
 		else:
 
@@ -71,11 +91,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 			recent_islamic_studies_activity = sorted(chain(recent_islamic_studies_posts, recent_islamic_studies_comments, recent_islamic_studies_exams), key=attrgetter('posted_date'))
 			context['recent_quran'] = list(reversed(recent_quran_activity[-3:]))
 			context['recent_islamic_studies'] = list(reversed(recent_islamic_studies_activity[-3:]))
-			if self.request.user.profile.islamic_studies_class and self.request.user.profile.islamic_studies_class<10:
+			if self.request.user.profile.islamic_studies_class:
 				context['islamic_studies_book'] = islamic_studies_books[self.request.user.profile.islamic_studies_class]
 			if self.request.user.profile.quran_class and self.request.user.profile.quran_class<10:
 				context['quran_book'] = quran_books[self.request.user.profile.quran_class]
-				
+			if self.request.user.profile.quran_class and self.request.user.profile.quran_class<10:
+				context['quran_outline'] = quran_outlines[self.request.user.profile.quran_class]	
+			if self.request.user.profile.islamic_studies_class and self.request.user.profile.islamic_studies_class<10:
+				context['islamic_studies_outline'] = islamic_studies_outlines[self.request.user.profile.islamic_studies_class]
 		return context
 
 

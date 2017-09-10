@@ -6,7 +6,7 @@
 <body>
 
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-lg-4">
 
           <!-- Profile Image -->
           <div class="box box-danger">
@@ -33,9 +33,21 @@
                 <br>
                 </li>
                {% endif %}
+                {% if quran_outline %}
+                <li class="list-group-item" style="padding-bottom: 20px;">
+                <b>Quran Course Outline</b> <a href="{{quran_outline}}" target="_blank" class="pull-right btn btn-primary">View</a>
+                <br>
+                </li>
+               {% endif %}
                 {% if islamic_studies_book %}
                 <li class="list-group-item" style="padding-bottom: 20px;">
                 <b>Islamic Studies Syllabus</b> <a href="{{islamic_studies_book}}" target="_blank" class="pull-right btn btn-primary">View</a>
+                <br>
+                </li>
+               {% endif %}
+                {% if islamic_studies_outline %}
+                <li class="list-group-item" style="padding-bottom: 20px;">
+                <b>Islamic Studies Course Outline</b> <a href="{{islamic_studies_outline}}" target="_blank" class="pull-right btn btn-primary">View</a>
                 <br>
                 </li>
                {% endif %}
@@ -68,7 +80,7 @@
       </div>
 
 
-      <div class="col-md-8">
+      <div class="col-lg-8">
               
   
           {% include "student_recentactivity.html" %}

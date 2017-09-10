@@ -242,10 +242,10 @@ def create_or_update_user_profile(sender,instance,created,**kwargs):
 			# Make sure you use the rit name here.
 			sheet = client.open("Student Accounts 2017-2018").sheet1
 
-			sheet.update_cell(instance.pk,1,instance.first_name)
-			sheet.update_cell(instance.pk,2,instance.last_name)
-			sheet.update_cell(instance.pk,3,instance.username)
-			sheet.update_cell(instance.pk,4,new_student_pass)
+			sheet.update_cell(instance.pk-19,1,instance.first_name)
+			sheet.update_cell(instance.pk-19,2,instance.last_name)
+			sheet.update_cell(instance.pk-19,3,instance.username)
+			sheet.update_cell(instance.pk-19,4,new_student_pass)
 
 		except BaseException:
 			return reverse('home')
@@ -278,31 +278,31 @@ def misc_updates(sender,instance,created,**kwargs):
 				 
 			first_name = instance.user.first_name
 			last_name = instance.user.last_name
-			sheet.update_cell(instance.user.pk,1,first_name)
-			sheet.update_cell(instance.user.pk,2,last_name)
-			sheet.update_cell(instance.user.pk,3,instance.quran_class)
+			sheet.update_cell(instance.user.pk-19,1,first_name)
+			sheet.update_cell(instance.user.pk-19,2,last_name)
+			sheet.update_cell(instance.user.pk-19,3,instance.quran_class)
 
-			sheet2.update_cell(instance.user.pk,1,first_name)
-			sheet2.update_cell(instance.user.pk,2,last_name)
-			sheet2.update_cell(instance.user.pk,3,instance.islamic_studies_class)
+			sheet2.update_cell(instance.user.pk-19,1,first_name)
+			sheet2.update_cell(instance.user.pk-19,2,last_name)
+			sheet2.update_cell(instance.user.pk-19,3,instance.islamic_studies_class)
 
-			sheet3.update_cell(instance.user.pk,1,first_name)
-			sheet3.update_cell(instance.user.pk,2,last_name)
-			sheet3.update_cell(instance.user.pk,3,instance.quran_class)
+			sheet3.update_cell(instance.user.pk-19,1,first_name)
+			sheet3.update_cell(instance.user.pk-19,2,last_name)
+			sheet3.update_cell(instance.user.pk-19,3,instance.quran_class)
 
-			sheet4.update_cell(instance.user.pk,1,first_name)
-			sheet4.update_cell(instance.user.pk,2,last_name)
-			sheet4.update_cell(instance.user.pk,3,instance.islamic_studies_class)
+			sheet4.update_cell(instance.user.pk-19,1,first_name)
+			sheet4.update_cell(instance.user.pk-19,2,last_name)
+			sheet4.update_cell(instance.user.pk-19,3,instance.islamic_studies_class)
 
-			sheet5.update_cell(instance.pk,5,instance.father_email)
-			sheet5.update_cell(instance.pk,6,instance.father_phone_number)
-			sheet5.update_cell(instance.pk,7,instance.mother_email)
-			sheet5.update_cell(instance.pk,8,instance.mother_phone_number)
-			sheet5.update_cell(instance.pk,9,instance.address)
-			sheet5.update_cell(instance.pk,10,instance.student_phone_number)
-			sheet5.update_cell(instance.pk,11,instance.user.email)
-			sheet5.update_cell(instance.pk,12,instance.quran_class)
-			sheet5.update_cell(instance.pk,13,instance.islamic_studies_class)
+			sheet5.update_cell(instance.pk-19,5,instance.father_email)
+			sheet5.update_cell(instance.pk-19,6,instance.father_phone_number)
+			sheet5.update_cell(instance.pk-19,7,instance.mother_email)
+			sheet5.update_cell(instance.pk-19,8,instance.mother_phone_number)
+			sheet5.update_cell(instance.pk-19,9,instance.address)
+			sheet5.update_cell(instance.pk-19,10,instance.student_phone_number)
+			sheet5.update_cell(instance.pk-19,11,instance.user.email)
+			sheet5.update_cell(instance.pk-19,12,instance.quran_class)
+			sheet5.update_cell(instance.pk-19,13,instance.islamic_studies_class)
 		
 			instance.updated_google_sheets = True
 			instance.save()
