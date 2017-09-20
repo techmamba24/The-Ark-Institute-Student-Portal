@@ -39,6 +39,7 @@ islamic_studies_outlines = {1:'https://drive.google.com/file/d/0B-AWw0mDOl6ER0R4
 
 quran_books =  {1:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/view?usp=sharing',
 			    2:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/view?usp=sharing',
+			    3:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/view?usp=sharing',
 				4:'https://drive.google.com/file/d/0B-AWw0mDOl6ES0xQaGZIU0ZWRTg/view?usp=sharing',
 				6:'https://drive.google.com/file/d/0B-AWw0mDOl6ET2xqdjA0WlRaVEk/view?usp=sharing',
 				7:'https://drive.google.com/file/d/0B-AWw0mDOl6EazZvTVM1UEtIbGs/view?usp=sharing',
@@ -47,6 +48,7 @@ quran_books =  {1:'https://drive.google.com/file/d/0B-AWw0mDOl6EX0RCc1BWYktMZ2s/
 
 quran_outlines = {1:'https://drive.google.com/file/d/0B-AWw0mDOl6ESGtRTnh2Sk9uWjA/view?usp=sharing',
 			    2:'https://drive.google.com/file/d/0B-AWw0mDOl6EN3hZbG5PWS04UmM/view?usp=sharing',
+			    3:'https://drive.google.com/file/d/0B-AWw0mDOl6EN3hZbG5PWS04UmM/view?usp=sharing',
 				4:'https://drive.google.com/file/d/0B-AWw0mDOl6ENlJDS3ZteGRiQ3c/view?usp=sharing',
 				6:'https://drive.google.com/file/d/0B-AWw0mDOl6ERUE3TWRwNkZnUmM/view?usp=sharing',
 				7:'https://drive.google.com/file/d/0B-AWw0mDOl6EMzNBS2NBekZQOVU/view?usp=sharing',
@@ -394,6 +396,10 @@ class StudentDetail(LoginRequiredMixin,DetailView):
 		student = self.kwargs['username']
 		userobj = User.objects.filter(username__iexact=student).first()
 
+		context['quran_attendance'] = sorted(userobj.quran_attendance.all(), key=attrgetter('week.week_number'))
+		context['islamic_studies_attendance'] = sorted(userobj.islamic_studies_attendance.all(), key=attrgetter('week.week_number'))
+
+
 		quran_results = userobj.quran_exam_scores.all()
 		if quran_results.exists():
 			quran_average = 0
@@ -627,7 +633,7 @@ class QuranAttendanceUpdate(LoginRequiredMixin,UpdateView):
 		self.object = form.save(commit=False)
 		self.object.class_level = context['userobj'].profile.quran_class
 		self.object.save()
-		context['userobj'].profile.unseen_quran_attendance.add(self.object)
+		# context['userobj'].profile.unseen_quran_attendance.add(self.object)
 		return super().form_valid(form)
 
 
@@ -638,8 +644,8 @@ class QuranAttendanceStudentView(LoginRequiredMixin, ListView):
 	template_name = 'students/quran_attendance.html'
 
 	def get_queryset(self):
-		for attendance in self.request.user.profile.unseen_quran_attendance.all():
-			self.request.user.profile.unseen_quran_attendance.remove(attendance)
+		# for attendance in self.request.user.profile.unseen_quran_attendance.all():
+		# 	self.request.user.profile.unseen_quran_attendance.remove(attendance)
 
 		return QuranAttendance.objects.filter(student=self.request.user)
 
@@ -697,7 +703,7 @@ class IslamicStudiesAttendanceUpdate(LoginRequiredMixin,UpdateView):
 		self.object = form.save(commit=False)
 		self.object.class_level = context['userobj'].profile.islamic_studies_class
 		self.object.save()
-		context['userobj'].profile.unseen_islamic_studies_attendance.add(self.object)
+		# context['userobj'].profile.unseen_islamic_studies_attendance.add(self.object)
 		return super().form_valid(form)
 
 
@@ -708,8 +714,8 @@ class IslamicStudiesAttendanceStudentView(LoginRequiredMixin, ListView):
 	template_name = 'students/islamic_studies_attendance.html'
 
 	def get_queryset(self):
-		for attendance in self.request.user.profile.unseen_islamic_studies_attendance.all():
-			self.request.user.profile.unseen_islamic_studies_attendance.remove(attendance)
+		# for attendance in self.request.user.profile.unseen_islamic_studies_attendance.all():
+		# 	self.request.user.profile.unseen_islamic_studies_attendance.remove(attendance)
 
 		return IslamicStudiesAttendance.objects.filter(student=self.request.user)
 

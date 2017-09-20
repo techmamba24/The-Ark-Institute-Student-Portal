@@ -34,6 +34,7 @@ class Profile(models.Model):
 
 	Q1 = 1
 	Q2 = 2
+	Q3 = 3
 	Q4 = 4
 	Q6 = 6
 	Q7 = 7
@@ -44,6 +45,7 @@ class Profile(models.Model):
 	Q_CHOICES = (
 			(Q1, 'Q1'),
 			(Q2, 'Q2'),
+			(Q3, 'Q3'),
 			(Q4, 'Q4'),
 			(Q6, 'Q6'),
 			(Q7, 'Q7'),
@@ -104,8 +106,8 @@ class Profile(models.Model):
 	unread_islamic_studies_comments = models.ManyToManyField('profiles.IslamicStudiesComment', related_name='unread_islamic_studies_comments', blank=True)
 	unseen_quran_exams = models.ManyToManyField('profiles.QuranExam', related_name='unseen_quran_exams', blank=True)
 	unseen_islamic_studies_exams = models.ManyToManyField('profiles.IslamicStudiesExam', related_name='unseen_islamic_studies_exams', blank=True)
-	unseen_quran_attendance = models.ManyToManyField('profiles.QuranAttendance', related_name='unseen_quran_attendance', blank=True)
-	unseen_islamic_studies_attendance = models.ManyToManyField('profiles.IslamicStudiesAttendance', related_name='unseen_islamic_studies_attendance', blank=True)
+	# unseen_quran_attendance = models.ManyToManyField('profiles.QuranAttendance', related_name='unseen_quran_attendance', blank=True)
+	# unseen_islamic_studies_attendance = models.ManyToManyField('profiles.IslamicStudiesAttendance', related_name='unseen_islamic_studies_attendance', blank=True)
 	activation_email_sent = models.BooleanField(default=False)
 	original_population = models.BooleanField(default=False)
 	updated_google_sheets = models.BooleanField(default=False)
@@ -328,6 +330,7 @@ class QuranAttendance(models.Model):
 
 	Q1 = 1
 	Q2 = 2
+	Q3 = 3
 	Q4 = 4
 	Q6 = 6
 	Q7 = 7
@@ -338,6 +341,7 @@ class QuranAttendance(models.Model):
 	Q_CHOICES = (
 			(Q1, 'Q1'),
 			(Q2, 'Q2'),
+			(Q3, 'Q3'),
 			(Q4, 'Q4'),
 			(Q6, 'Q6'),
 			(Q7, 'Q7'),
@@ -391,7 +395,7 @@ def update_google_sheet_quran_attendance(sender,instance,created,**kwargs):
 		# Make sure you use the right name here.
 		sheet = client.open("Quran Attendance Sample").sheet1
 		 
-		sheet.update_cell(instance.student.pk,instance.week.week_number+6,instance.attendance)
+		sheet.update_cell(instance.student.pk-19,instance.week.week_number+6,instance.attendance)
 
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})
@@ -471,7 +475,7 @@ def update_google_sheet_islamic_studies_attendance(sender,instance,created,**kwa
 		# Make sure you use the rit name here.
 		sheet = client.open("Islamic Studies Attendance Sample").sheet1
 		 
-		sheet.update_cell(instance.student.pk,instance.week.week_number+6,instance.attendance)
+		sheet.update_cell(instance.student.pk-19,instance.week.week_number+6,instance.attendance)
 
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})
@@ -491,6 +495,7 @@ class QuranExam(models.Model):
 
 	Q1 = 1
 	Q2 = 2
+	Q3 = 3
 	Q4 = 4
 	Q6 = 6
 	Q7 = 7
@@ -501,6 +506,7 @@ class QuranExam(models.Model):
 	Q_CHOICES = (
 			(Q1, 'Q1'),
 			(Q2, 'Q2'),
+			(Q3, 'Q3'),
 			(Q4, 'Q4'),
 			(Q6, 'Q6'),
 			(Q7, 'Q7'),
@@ -550,11 +556,11 @@ def update_google_sheet_quran(sender,instance,created,**kwargs):
 		 
 		exam_score = instance.exam_score
 		if instance.exam_number == 1:
-			sheet.update_cell(instance.student.pk,4,exam_score)
+			sheet.update_cell(instance.student.pk-19,4,exam_score)
 		elif instance.exam_number ==2:
-			sheet.update_cell(instance.student.pk,5,exam_score)
+			sheet.update_cell(instance.student.pk-19,5,exam_score)
 		else:
-			sheet.update_cell(instance.student.pk,6,exam_score)
+			sheet.update_cell(instance.student.pk-19,6,exam_score)
 
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})
@@ -638,11 +644,11 @@ def update_google_sheet_islamic_studies(sender,instance,created,**kwargs):
 
 		exam_score = instance.exam_score
 		if instance.exam_number == 1:
-			sheet.update_cell(instance.student.pk,4,exam_score)
+			sheet.update_cell(instance.student.pk-19,4,exam_score)
 		elif instance.exam_number ==2:
-			sheet.update_cell(instance.student.pk,5,exam_score)
+			sheet.update_cell(instance.student.pk-19,5,exam_score)
 		else:
-			sheet.update_cell(instance.student.pk,6,exam_score)
+			sheet.update_cell(instance.student.pk-19,6,exam_score)
 	
 	except BaseException:
 		return reverse('student_detail',kwargs={'username':instance.student.username})

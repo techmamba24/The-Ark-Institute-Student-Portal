@@ -16,9 +16,12 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic.base import TemplateView
-from administrator.views import QuranRosterClasses, QuranRosterClassList, IslamicStudiesRosterClasses, IslamicStudiesRosterClassList, QuranPostsList,IslamicStudiesPostsList,QuranClassPostListView,IslamicStudiesClassPostListView,QuranClassExamScores,QuranClassesExamList,IslamicStudiesClassExamScores, IslamicStudiesClassesExamList, QuranClassWeekAttendance, QuranClassWeekAttendanceUpdate, QuranClassesAttendanceList, QuranClassWeeksList, IslamicStudiesClassWeekAttendance, IslamicStudiesClassWeekAttendanceUpdate, IslamicStudiesClassesAttendanceList, IslamicStudiesClassWeeksList, IslamicStudiesExamScoreAdd, QuranExamScoreAdd
+from administrator.views import QuranRosterClasses, QuranRosterClassList, IslamicStudiesRosterClasses, IslamicStudiesRosterClassList, QuranPostsList,IslamicStudiesPostsList,QuranClassPostListView,IslamicStudiesClassPostListView,QuranClassExamScores,QuranClassesExamList,IslamicStudiesClassExamScores, IslamicStudiesClassesExamList, QuranClassWeekAttendance, QuranClassWeekAttendanceUpdate, QuranClassesAttendanceList, QuranClassWeeksList, IslamicStudiesClassWeekAttendance, IslamicStudiesClassWeekAttendanceUpdate, IslamicStudiesClassesAttendanceList, IslamicStudiesClassWeeksList, IslamicStudiesExamScoreAdd, QuranExamScoreAdd,FullStudentList,FullTeacherList
 
 urlpatterns = [
+    url(r'^all-students/$', FullStudentList.as_view(),name='all_students'),
+    url(r'^all-teachers/$', FullTeacherList.as_view(),name='all_teachers'),
+    url(r'^quran-class-rosters/$', QuranRosterClasses.as_view(),name='qrosters'),
     url(r'^quran-class-rosters/$', QuranRosterClasses.as_view(),name='qrosters'),
     url(r'^quran-class-rosters/(?P<level>([1-9]|10))/$', QuranRosterClassList.as_view(),name='quranstudentlist'),
     url(r'^islamic-studies-class-rosters/$', IslamicStudiesRosterClasses.as_view(),name='isrosters'),

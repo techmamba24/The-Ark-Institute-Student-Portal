@@ -434,7 +434,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </tr>
                 </thead>
                 <tbody>
-                {% for entry in user.quran_attendance.all  %}
+                {% for entry in quran_attendance %}
                   <tr>
                     <td>{{entry.week.week_number}}</td>
                     <td>{{entry.week.date}}</td>
@@ -467,7 +467,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </tr>
                 </thead>
                 <tbody>
-                {% for entry in user.islamic_studies_attendance.all  %}
+                {% for entry in islamic_studies_attendance %}
                   <tr>
                     <td>{{entry.week.week_number}}</td>
                     <td>{{entry.week.date}}</td>

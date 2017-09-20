@@ -163,10 +163,10 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-bell-o"></i> 
 
-            {% if request.user.profile.unseen_quran_exams.count > 0 or request.user.profile.unseen_islamic_studies_exams.count > 0 %}
+            {% if request.user.profile.unseen_quran_exams.count > 0 or request.user.profile.unseen_islamic_studies_exams.count > 0 or request.user.profile.unseen_quran_attendance.count > 0 or request.user.profile.unseen_islamic_studies_attendance.count > 0 %}
 
               <span class="label label-warning">
-                  {{request.user.profile.unseen_quran_exams.count|add:request.user.profile.unseen_islamic_studies_exams.count}} </span>
+                  {{request.user.profile.unseen_quran_exams.count|add:request.user.profile.unseen_islamic_studies_exams.count|add:request.user.profile.unseen_quran_attendance.count|add:request.user.profile.unseen_islamic_studies_attendance.count}} </span>
           
             
             {% endif %}
@@ -174,7 +174,7 @@
              </a>
 
             <ul class="dropdown-menu">
-              <li class="header">You have {{request.user.profile.unseen_quran_exams.count|add:request.user.profile.unseen_islamic_studies_exams.count}} notifications.</li>
+              <li class="header">You have {{request.user.profile.unseen_quran_exams.count|add:request.user.profile.unseen_islamic_studies_exams.count|add:request.user.profile.unseen_quran_attendance.count|add:request.user.profile.unseen_islamic_studies_attendance.count}} notifications.</li>
 
            {% for exam in request.user.profile.unseen_quran_exams.all %}
                 
@@ -208,8 +208,40 @@
 
            {% endfor %}
 
+          {% for attendance in request.user.profile.unseen_quran_attendance.all %}
+                
+              <li>
+                <!-- Inner Menu: contains the notifications -->
+                <ul class="menu">
+                  <li><!-- start notification -->
+                    <a href="{% url 'student_quran_attendance' %}">
+                     <i class="fa fa-pencil text-yellow"></i> Your Quran attendance for <i>Week {{attendance.week.week_number}}</i> has been updated.
+                    </a>
+                  </li>
+                  <!-- end notification -->
+                </ul>
+              </li>
+
+           {% endfor %}
 
 
+
+
+          {% for attendance in request.user.profile.unseen_islamic_studies_attendance.all %}
+                
+              <li>
+                <!-- Inner Menu: contains the notifications -->
+                <ul class="menu">
+                  <li><!-- start notification -->
+                    <a href="{% url 'student_islamic_studies_attendance' %}">
+                     <i class="fa fa-pencil text-yellow"></i> Your Islamic Studies attendance for <i>Week {{attendance.week.week_number}}</i> has been updated.
+                    </a>
+                  </li>
+                  <!-- end notification -->
+                </ul>
+              </li>
+
+           {% endfor %}
 
             </ul>
          </li>

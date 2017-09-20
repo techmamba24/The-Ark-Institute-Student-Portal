@@ -18,7 +18,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 
 User = get_user_model()
 
-quran_classes = [1,2,4,6,7,8,9,10]
+quran_classes = [1,2,3,4,6,7,8,9,10]
 
 islamic_studies_classes = [1,2,3,4,5,6,7,8,9,10]
 
@@ -359,7 +359,7 @@ class QuranClassWeekAttendanceUpdate(LoginRequiredMixin, PermissionRequiredMixin
 		self.object = form.save(commit=False)
 		self.object.class_level = context['userobj'].profile.quran_class
 		self.object.save()
-		context['userobj'].profile.unseen_quran_attendance.add(self.object)
+		# context['userobj'].profile.unseen_quran_attendance.add(self.object)
 		return super().form_valid(form)
 
 	def get_success_url(self):
@@ -443,7 +443,7 @@ class IslamicStudiesClassWeekAttendanceUpdate(LoginRequiredMixin, PermissionRequ
 		self.object = form.save(commit=False)
 		self.object.class_level = context['userobj'].profile.islamic_studies_class
 		self.object.save()
-		context['userobj'].profile.unseen_islamic_studies_attendance.add(self.object)
+		# context['userobj'].profile.unseen_islamic_studies_attendance.add(self.object)
 		return super().form_valid(form)
 
 	def get_success_url(self):
@@ -451,6 +451,37 @@ class IslamicStudiesClassWeekAttendanceUpdate(LoginRequiredMixin, PermissionRequ
 
 	def has_permission(self):
 		return self.request.user.is_staff
+
+class FullStudentList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+	template_name = 'administrator/allstudents.html'
+
+	def get_queryset(self):
+		return User.objects.filter(profile__role='Student')
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(FullStudentList,self).get_context_data(*args,**kwargs)
+		student_count = User.objects.filter(profile__role='Student').count()
+		context['student_count'] = student_count
+		return context
+
+	def has_permission(self):
+		return self.request.user.is_staff
+
+class FullTeacherList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+	template_name = 'administrator/allteachers.html'
+
+	def get_queryset(self):
+		return User.objects.filter(profile__role='Teacher')
+
+	def get_context_data(self,*args,**kwargs):
+		context = super(FullTeacherList,self).get_context_data(*args,**kwargs)
+		teacher_count = User.objects.filter(profile__role='Teacher').count()
+		context['teacher_count'] = teacher_count
+		return context
+
+	def has_permission(self):
+		return self.request.user.is_staff
+
 
 
 
